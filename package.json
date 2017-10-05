@@ -22,20 +22,20 @@
     "lib/*.js"
   ],
   "scripts": {
-    "prepublish": "gulp coffee --require \"coffee-script/register\"",
-    "test": "coffeelint gulpfile.coffee index.coffee lib test -f ./coffeelint.json && istanbul test _mocha --report lcovonly -- ./test/*.coffee --require coffee-script/register --reporter spec",
+    "prepublish": "gulp coffee --require \"coffeescript/register\"",
+    "test": "coffeelint gulpfile.coffee index.coffee lib test -f ./coffeelint.json && istanbul test _mocha --report lcovonly -- ./test/*.coffee --require coffeescript/register --reporter spec",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "changelog": "conventional-changelog -p angular -i changelog.md -w"
   },
   "dependencies": {
     "args-js": "^0.10.5",
-    "coffeelint": "^1.4.0",
+    "coffeelint": "^2.0.6",
     "coffeelint-stylish": "^0.1.1",
     "gulp-util": "^3.0.0",
     "through2": "^2.0.0"
   },
   "devDependencies": {
-    "coffee-script": "^1.7.1",
+    "coffeescript": "^2.0.1",
     "coffeelint-use-strict": "^1.0.0",
     "conventional-changelog": "^1.0.0",
     "coveralls": "^2.8.0",
