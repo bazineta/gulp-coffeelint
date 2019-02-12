@@ -1,5 +1,3 @@
-'use strict'
-
 fs = require 'fs'
 through2 = require 'through2'
 Args = require 'args-js' # main entry missing in `args-js` package

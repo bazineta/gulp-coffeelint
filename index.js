@@ -1,4 +1,3 @@
-'use strict';
 var Args, coffeelint, coffeelintPlugin, configfinder, createPluginError, formatOutput, fs, isLiterate, reporter, through2;
 
 fs = require('fs');

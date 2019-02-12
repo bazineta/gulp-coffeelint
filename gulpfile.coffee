@@ -1,5 +1,3 @@
-'use strict'
-
 coffee = require 'gulp-coffee'
 colors = require 'ansi-colors'
 del    = require 'del'
@@ -36,11 +34,11 @@ coffeelint = ->
         .pipe lint()
         .pipe lint.reporter()
 
-# dev
+# development
 
-dev = -> watch ['./{,lib/,test/,test/fixtures/}*{.coffee,.json}'], test
+develop = -> watch ['./{,lib/,test/,test/fixtures/}*{.coffee,.json}'], test
 
-exports.default    = series compile, dev
+exports.default    = series compile, develop
 exports.test       = series compile, test
 exports.clean      = clean
 exports.coffee     = compile

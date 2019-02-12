@@ -2,10 +2,6 @@
     "indentation": {
         "value": 4
     },
-    "use_strict": {
-        "requireGlobal": true,
-        "module": "coffeelint-use-strict"
-    },
     "braces_spacing": {
         "level": "error"
     },

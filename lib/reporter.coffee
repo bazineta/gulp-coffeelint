@@ -1,4 +1,4 @@
-'use strict'
+
 
 through2 = require 'through2'
 {createPluginError} = require './utils'

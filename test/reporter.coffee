@@ -1,5 +1,3 @@
-'use strict'
-
 # module dependencies
 should      = require 'should'
 sinon       = require 'sinon'

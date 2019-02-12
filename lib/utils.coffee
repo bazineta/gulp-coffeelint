@@ -1,5 +1,3 @@
-'use strict'
-
 PluginError = require 'plugin-error'
 
 exports.isLiterate = (file) ->
