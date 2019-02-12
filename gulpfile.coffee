@@ -1,5 +1,4 @@
 coffee = require 'gulp-coffee'
-colors = require 'ansi-colors'
 del    = require 'del'
 lint   = require './index.coffee'
 {
@@ -30,7 +29,7 @@ test = -> spawn 'npm', ['test'], stdio: 'inherit'
 # run `gulp-coffeelint` for testing purposes
 
 coffeelint = ->
-    return src './{,lib/,test/,test/fixtures/}*.coffee'
+    return src './{,lib/}*.coffee'
         .pipe lint()
         .pipe lint.reporter()
 
