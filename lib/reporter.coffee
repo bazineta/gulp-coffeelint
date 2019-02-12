@@ -45,16 +45,16 @@ failOnWarningReporter = ->
         cb()
 
 reporter = (type) ->
-    return failReporter() if type is 'fail'
+    return failReporter()          if type is 'fail'
     return failOnWarningReporter() if type is 'failOnWarning'
 
-    type ?= 'coffeelint-stylish'
-    reporter = loadReporter(type)
+    type    ?= 'coffeelint-stylish'
+    instance = loadReporter type
 
-    unless typeof reporter is 'function'
+    unless typeof instance is 'function'
         throw createPluginError "#{type} is not a valid reporter"
 
-    return reporterStream(reporter)
+    return reporterStream instance
 
 loadReporter = (reporter) ->
     return reporter if typeof reporter is 'function'
