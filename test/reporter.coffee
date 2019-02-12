@@ -1,10 +1,11 @@
 'use strict'
 
 # module dependencies
-gutil = require 'gulp-util'
-should = require 'should'
-sinon = require 'sinon'
-proxyquire = require('proxyquire').noPreserveCache()
+should      = require 'should'
+sinon       = require 'sinon'
+vinyl       = require 'vinyl'
+PluginError = require 'plugin-error'
+proxyquire  = require('proxyquire').noPreserveCache()
 
 # const
 PLUGIN_NAME = 'gulp-coffeelint'
@@ -48,17 +49,17 @@ describe 'gulp-coffeelint', ->
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.reset()
+            spiedReporter.resetHistory()
             spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint.reporter()
 
@@ -67,7 +68,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -81,22 +82,22 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if warnings', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
                 warningCount: 0,
                 errorCount: 0
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -129,11 +130,11 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if errors', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
@@ -143,11 +144,11 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file.js': [bugs: 'some']
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -193,17 +194,17 @@ describe 'gulp-coffeelint', ->
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.reset()
+            spiedReporter.resetHistory()
             spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint.reporter('raw')
 
@@ -212,7 +213,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -226,22 +227,22 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if warnings', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
                 warningCount: 0,
                 errorCount: 0
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -274,11 +275,11 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if errors', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
@@ -288,11 +289,11 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file.js': [bugs: 'some']
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -338,17 +339,17 @@ describe 'gulp-coffeelint', ->
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.reset()
+            spiedReporter.resetHistory()
             spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint.reporter('coffeelint/lib/reporters/raw')
 
@@ -357,7 +358,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -371,22 +372,22 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if warnings', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
                 warningCount: 0,
                 errorCount: 0
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -419,11 +420,11 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if errors', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
@@ -433,11 +434,11 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file.js': [bugs: 'some']
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -483,17 +484,17 @@ describe 'gulp-coffeelint', ->
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.reset()
+            spiedReporter.resetHistory()
             spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint.reporter('coffeelint-stylish')
 
@@ -502,7 +503,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -516,22 +517,22 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if warnings', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
                 warningCount: 0,
                 errorCount: 0
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -564,11 +565,11 @@ describe 'gulp-coffeelint', ->
         it 'calls reporter if errors', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
@@ -578,11 +579,11 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file.js': [bugs: 'some']
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 success: true,
@@ -619,11 +620,11 @@ describe 'gulp-coffeelint', ->
         it 'should pass through an okay file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint.reporter 'fail'
 
@@ -632,7 +633,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -647,11 +648,11 @@ describe 'gulp-coffeelint', ->
         it 'should not pass through a bad file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             fakeFile.coffeelint = success: false, results: [bugs: 'many']
 
@@ -662,7 +663,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -681,19 +682,19 @@ describe 'gulp-coffeelint', ->
             dataCounter = 0
             errorCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint = success: true
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint = success: false, results: [bugs: 'many']
 
@@ -711,7 +712,7 @@ describe 'gulp-coffeelint', ->
             stream.on 'error', (e) ->
                 ++errorCounter
                 should.exist e
-                e.should.be.an.instanceof gutil.PluginError
+                e.should.be.an.instanceof PluginError
                 e.should.have.property 'message'
                 e.message.should.equal 'CoffeeLint failed for file2.js'
 
@@ -730,11 +731,11 @@ describe 'gulp-coffeelint', ->
         it 'should pass through an okay file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint.reporter 'failOnWarning'
 
@@ -743,7 +744,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -758,11 +759,11 @@ describe 'gulp-coffeelint', ->
         it 'should not pass through a bad file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             fakeFile.coffeelint =
                 warningCount: 0,
@@ -776,7 +777,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -795,22 +796,22 @@ describe 'gulp-coffeelint', ->
             dataCounter = 0
             errorCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'success()'
+                contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
                 success: true,
                 warningCount: 0,
                 errorCount: 0
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
                 warningCount: 1,
@@ -830,7 +831,7 @@ describe 'gulp-coffeelint', ->
             stream.on 'error', (e) ->
                 ++errorCounter
                 should.exist e
-                e.should.be.an.instanceof gutil.PluginError
+                e.should.be.an.instanceof PluginError
                 e.should.have.property 'message'
                 e.message.should.equal 'CoffeeLint failed for file2.js'
 

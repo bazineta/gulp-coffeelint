@@ -1,6 +1,6 @@
 'use strict'
 
-{PluginError} = require 'gulp-util'
+PluginError = require 'plugin-error'
 
 exports.isLiterate = (file) ->
     /\.(litcoffee|coffee\.md)$/.test file

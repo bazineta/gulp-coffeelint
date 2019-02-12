@@ -1,9 +1,9 @@
 'use strict'
 
 # module dependencies
+path   = require 'path'
 should = require 'should'
-gutil = require 'gulp-util'
-path = require 'path'
+vinyl  = require 'vinyl'
 
 # const
 PLUGIN_NAME = 'gulp-coffeelint'
@@ -26,7 +26,7 @@ describe 'gulp-coffeelint', ->
         it 'should pass through empty file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
@@ -39,7 +39,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.not.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -53,11 +53,11 @@ describe 'gulp-coffeelint', ->
         it 'should pass through the file', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'sure()'
+                contents: Buffer.from 'sure()'
 
             stream = coffeelint()
 
@@ -66,7 +66,7 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.path)
                 should.exist(newFile.relative)
                 should.exist(newFile.contents)
-                newFile.path.should.equal './test/fixture/file.js'
+                newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
                 ++dataCounter
 
@@ -81,17 +81,17 @@ describe 'gulp-coffeelint', ->
         it 'should pass through two files', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeah()'
+                contents: Buffer.from 'yeah()'
 
-            fakeFile2 = new gutil.File
+            fakeFile2 = new vinyl
                 path: './test/fixture/file2.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeahmetoo()'
+                contents: Buffer.from 'yeahmetoo()'
 
 
             stream = coffeelint()
@@ -110,11 +110,11 @@ describe 'gulp-coffeelint', ->
         it 'should send success status', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeah()'
+                contents: Buffer.from 'yeah()'
 
             stream = coffeelint {}
 
@@ -134,11 +134,11 @@ describe 'gulp-coffeelint', ->
         it 'should send success status even when there are warnings', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'debugger'
+                contents: Buffer.from 'debugger'
 
             stream = coffeelint 'no_debugger': 'level': 'warn'
 
@@ -162,11 +162,11 @@ describe 'gulp-coffeelint', ->
         it 'should send bad results', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeah();'
+                contents: Buffer.from 'yeah();'
 
             stream = coffeelint {}
 
@@ -202,11 +202,11 @@ describe 'gulp-coffeelint', ->
         it 'should load explicitly set config and send results', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeah();'
+                contents: Buffer.from 'yeah();'
 
             stream = coffeelint path.join __dirname, './coffeelint.json'
 
@@ -245,11 +245,11 @@ describe 'gulp-coffeelint', ->
         it 'optFile param should overrule opt param', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeah();'
+                contents: Buffer.from 'yeah();'
 
             stream = coffeelint(
                 path.join(__dirname, './coffeelint.json'),
@@ -291,11 +291,11 @@ describe 'gulp-coffeelint', ->
         it 'should load config as cli does and send results', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'yeah();'
+                contents: Buffer.from 'yeah();'
 
             stream = coffeelint()
 
@@ -334,11 +334,11 @@ describe 'gulp-coffeelint', ->
         it 'should load custom rule', (done) ->
             dataCounter = 0
 
-            fakeFile = new gutil.File
+            fakeFile = new vinyl
                 path: './test/fixture/file.js',
                 cwd: './test/',
                 base: './test/fixture/',
-                contents: new Buffer 'console.log "gulp is awesome"'
+                contents: Buffer.from 'console.log "gulp is awesome"'
 
             stream = coffeelint({}, [customRule])
 
@@ -377,11 +377,11 @@ describe 'gulp-coffeelint', ->
             it 'args-js may modify the `params` parameter', (done) ->
                 dataCounter = 0
 
-                fakeFile = new gutil.File
+                fakeFile = new vinyl
                     path: './test/fixture/file.js',
                     cwd: './test/',
                     base: './test/fixture/',
-                    contents: new Buffer 'console.log "gulp is awesome"'
+                    contents: Buffer.from 'console.log "gulp is awesome"'
 
                 opt = max_line_length: {value: 1024, level: 'ignore'}
 
@@ -424,7 +424,7 @@ describe 'gulp-coffeelint', ->
 
             describe 'are emitted', ->
                 it 'if file is stream', (done) ->
-                    fakeFile = new gutil.File
+                    fakeFile = new vinyl
                         path: './test/fixture/file.js',
                         cwd: './test/',
                         base: './test/fixture/',

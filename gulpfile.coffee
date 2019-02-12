@@ -1,33 +1,49 @@
 'use strict'
 
-fs = require 'fs'
-{spawn} = require 'child_process'
-gulp = require 'gulp'
 coffee = require 'gulp-coffee'
-del = require 'del'
-{log,colors} = require 'gulp-util'
+colors = require 'ansi-colors'
+del    = require 'del'
+fs     = require 'fs'
+lint   = require './index.coffee'
+log    = require 'fancy-log'
+{
+    src,
+    dest,
+    series,
+    watch
+} = require 'gulp'
+{
+    spawn
+} = require 'child_process'
 
 # compile `index.coffee` and `lib/*.coffee` files
-gulp.task 'coffee', ->
-    gulp.src ['{,lib/}*.coffee', '!gulpfile.coffee']
+
+compile = ->
+    return src ['{,lib/}*.coffee', '!gulpfile.coffee']
         .pipe coffee bare: true
-        .pipe gulp.dest './'
+        .pipe dest './'
 
 # remove `index.js`, `lib/*.js` and `coverage` dir
-gulp.task 'clean', ->
-    del ['index.js', 'lib/*.js', 'coverage']
+
+clean = -> del ['index.js', 'lib/*.js', 'coverage']
 
 # run tests
-gulp.task 'test', ['coffee'], ->
-    spawn 'npm', ['test'], stdio: 'inherit'
+
+test = -> spawn 'npm', ['test'], stdio: 'inherit'
 
 # run `gulp-coffeelint` for testing purposes
-gulp.task 'coffeelint', ->
-    coffeelint = require './index.coffee'
-    gulp.src './{,lib/,test/,test/fixtures/}*.coffee'
-        .pipe coffeelint()
-        .pipe coffeelint.reporter()
 
-# start workflow
-gulp.task 'default', ['coffee'], ->
-    gulp.watch ['./{,lib/,test/,test/fixtures/}*{.coffee,.json}'], ['test']
+lint = ->
+    return src './{,lib/,test/,test/fixtures/}*.coffee'
+        .pipe lint()
+        .pipe lint.reporter()
+
+# dev
+
+dev = -> watch ['./{,lib/,test/,test/fixtures/}*{.coffee,.json}'], test
+
+exports.default    = series compile, dev
+exports.test       = series compile, test
+exports.clean      = clean
+exports.coffee     = compile
+exports.coffeelint = lint

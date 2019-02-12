@@ -1,9 +1,9 @@
 'use strict'
 
 # module dependencies
+path   = require 'path'
 should = require 'should'
-gutil = require 'gulp-util'
-path = require 'path'
+vinyl  = require 'vinyl'
 
 # SUT
 coffeelint = require '../'
@@ -14,11 +14,11 @@ describe 'gulp-coffeelint', ->
             it 'on .coffee with Literate contents', (done) ->
                 dataCounter = 0
 
-                fakeFile = new gutil.File
+                fakeFile = new vinyl
                     path: './test/fixture/file.coffee',
                     cwd: './test/',
                     base: './test/fixture/',
-                    contents: new Buffer 'Comments!\n  yeah()'
+                    contents: Buffer.from 'Comments!\n  yeah()'
 
                 stream = coffeelint {}
 
@@ -39,11 +39,11 @@ describe 'gulp-coffeelint', ->
             it 'on .litcoffee with literate: false', (done) ->
                 dataCounter = 0
 
-                fakeFile = new gutil.File
+                fakeFile = new vinyl
                     path: './test/fixture/file.litcoffee',
                     cwd: './test/',
                     base: './test/fixture/',
-                    contents: new Buffer 'Comments!\n  yeah()'
+                    contents: Buffer.from 'Comments!\n  yeah()'
 
                 stream = coffeelint false
 
@@ -66,11 +66,11 @@ describe 'gulp-coffeelint', ->
                     it "on #{(extension or 'no extension')}", (done) ->
                         dataCounter = 0
 
-                        fakeFile = new gutil.File
+                        fakeFile = new vinyl
                             path: "./test/fixture/file' #{extension}",
                             cwd: './test/',
                             base: './test/fixture/',
-                            contents: new Buffer 'yeah()'
+                            contents: Buffer.from 'yeah()'
 
                         stream = coffeelint {}
 
@@ -95,11 +95,11 @@ describe 'gulp-coffeelint', ->
                     it 'on ' + extension, (done) ->
                         dataCounter = 0
 
-                        fakeFile = new gutil.File
+                        fakeFile = new vinyl
                             path: './test/fixture/file' + extension,
                             cwd: './test/',
                             base: './test/fixture/',
-                            contents: new Buffer 'Comments!\n  yeah()'
+                            contents: Buffer.from 'Comments!\n  yeah()'
 
                         stream = coffeelint {}
 
@@ -121,11 +121,11 @@ describe 'gulp-coffeelint', ->
             it 'on .coffee with literate: true', (done) ->
                 dataCounter = 0
 
-                fakeFile = new gutil.File
+                fakeFile = new vinyl
                     path: './test/fixture/file.coffee',
                     cwd: './test/',
                     base: './test/fixture/',
-                    contents: new Buffer 'yeah()'
+                    contents: Buffer.from 'yeah()'
 
                 stream = coffeelint true
 
@@ -155,11 +155,11 @@ describe 'gulp-coffeelint', ->
                     '.md': false
 
                 fakeFiles = for extension, literate of extensions
-                    fakeFile = new gutil.File
+                    fakeFile = new vinyl
                         path: './test/fixture/file' + extension,
                         cwd: './test/',
                         base: './test/fixture/',
-                        contents: new Buffer 'yeah()'
+                        contents: Buffer.from 'yeah()'
                     fakeFile.literate = literate
                     fakeFile
 
@@ -191,11 +191,11 @@ describe 'gulp-coffeelint', ->
                 ]
 
                 fakeFiles = for extension in extensions
-                    fakeFile = new gutil.File
+                    fakeFile = new vinyl
                         path: './test/fixture/file' + extension,
                         cwd: './test/',
                         base: './test/fixture/',
-                        contents: new Buffer 'yeah()'
+                        contents: Buffer.from 'yeah()'
 
                 stream = coffeelint {}, true
 
@@ -224,11 +224,11 @@ describe 'gulp-coffeelint', ->
                 ]
 
                 fakeFiles = for extension in extensions
-                    fakeFile = new gutil.File
+                    fakeFile = new vinyl
                         path: './test/fixture/file' + extension,
                         cwd: './test/',
                         base: './test/fixture/',
-                        contents: new Buffer 'yeah()'
+                        contents: Buffer.from 'yeah()'
 
                 stream = coffeelint {}, false
 
