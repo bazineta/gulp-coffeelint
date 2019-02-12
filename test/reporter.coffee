@@ -14,44 +14,44 @@ ERR_MSG =
 describe 'gulp-coffeelint', ->
 
     describe 'coffeelint.reporter function', ->
-        coffeelint = null
+        sut = coffeelint: null
 
         beforeEach ->
             # SUT
-            coffeelint = require '../'
+            sut.coffeelint = require '../'
 
         it 'throws when passed invalid reporter type', (done) ->
             try
-                coffeelint.reporter 'stupid'
+                sut.coffeelint.reporter 'stupid'
             catch e
                 should(e.plugin).equal PLUGIN_NAME
                 should(e.message).equal "stupid #{ERR_MSG.REPORTER}"
                 done()
 
     describe 'running coffeelint.reporter()', ->
-        coffeelint = null
-        publishStub = null
-        spiedReporter = null
+        sut =
+            coffeelint: null
+            publishStub: null
+            spiedReporter: null
 
         beforeEach ->
-            defaultReporter = require 'coffeelint-stylish'
-            spiedReporter = sinon.spy defaultReporter
-            proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint-stylish': spiedReporter
+            sut.spiedReporter   = sinon.spy require 'coffeelint-stylish'
+            proxyReportHandler  = proxyquire '../lib/reporter',
+                'coffeelint-stylish': sut.spiedReporter
 
             # SUT
-            coffeelint = proxyquire '../',
+            sut.coffeelint = proxyquire '../',
                 './lib/reporter': proxyReportHandler
 
-            publishStub = sinon.stub spiedReporter.prototype, 'publish'
+            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.resetHistory()
-            spiedReporter.prototype.publish.restore()
+            sut.spiedReporter.resetHistory()
+            sut.spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -59,7 +59,7 @@ describe 'gulp-coffeelint', ->
                 base: './test/fixture/',
                 contents: Buffer.from 'sure()'
 
-            stream = coffeelint.reporter()
+            stream = sut.coffeelint.reporter()
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -68,17 +68,17 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'calls reporter if warnings', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -105,16 +105,16 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file2.js': [bugs: 'kinda']
 
-            stream = coffeelint.reporter()
+            stream = sut.coffeelint.reporter()
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -126,7 +126,7 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
         it 'calls reporter if errors', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -153,16 +153,16 @@ describe 'gulp-coffeelint', ->
                 warningCount: 0,
                 errorCount: 0,
 
-            stream = coffeelint.reporter()
+            stream = sut.coffeelint.reporter()
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file.js': [bugs: 'some']
@@ -174,29 +174,29 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'raw\')', ->
-        coffeelint = null
-        publishStub = null
-        spiedReporter = null
+        sut =
+            coffeelint: null
+            publishStub: null
+            spiedReporter: null
 
         beforeEach ->
-            selectedReporter = require 'coffeelint/lib/reporters/raw'
-            spiedReporter = sinon.spy selectedReporter
+            sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
             proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint/lib/reporters/raw': spiedReporter
+                'coffeelint/lib/reporters/raw': sut.spiedReporter
 
             # SUT
-            coffeelint = proxyquire '../',
+            sut.coffeelint = proxyquire '../',
                 './lib/reporter': proxyReportHandler
 
-            publishStub = sinon.stub spiedReporter.prototype, 'publish'
+            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.resetHistory()
-            spiedReporter.prototype.publish.restore()
+            sut.spiedReporter.resetHistory()
+            sut.spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -204,7 +204,7 @@ describe 'gulp-coffeelint', ->
                 base: './test/fixture/',
                 contents: Buffer.from 'sure()'
 
-            stream = coffeelint.reporter('raw')
+            stream = sut.coffeelint.reporter('raw')
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -213,17 +213,17 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'calls reporter if warnings', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -250,16 +250,16 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file2.js': [bugs: 'kinda']
 
-            stream = coffeelint.reporter('raw')
+            stream = sut.coffeelint.reporter('raw')
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -271,7 +271,7 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
         it 'calls reporter if errors', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -298,16 +298,16 @@ describe 'gulp-coffeelint', ->
                 warningCount: 0,
                 errorCount: 0,
 
-            stream = coffeelint.reporter('raw')
+            stream = sut.coffeelint.reporter('raw')
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file.js': [bugs: 'some']
@@ -319,29 +319,29 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'coffeelint/lib/reporters/raw\')', ->
-        coffeelint = null
-        publishStub = null
-        spiedReporter = null
+        sut =
+            coffeelint: null
+            publishStub: null
+            spiedReporter: null
 
         beforeEach ->
-            selectedReporter = require 'coffeelint/lib/reporters/raw'
-            spiedReporter = sinon.spy selectedReporter
+            sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
             proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint/lib/reporters/raw': spiedReporter
+                'coffeelint/lib/reporters/raw': sut.spiedReporter
 
             # SUT
-            coffeelint = proxyquire '../',
+            sut.coffeelint = proxyquire '../',
                 './lib/reporter': proxyReportHandler
 
-            publishStub = sinon.stub spiedReporter.prototype, 'publish'
+            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.resetHistory()
-            spiedReporter.prototype.publish.restore()
+            sut.spiedReporter.resetHistory()
+            sut.spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -349,7 +349,7 @@ describe 'gulp-coffeelint', ->
                 base: './test/fixture/',
                 contents: Buffer.from 'sure()'
 
-            stream = coffeelint.reporter('coffeelint/lib/reporters/raw')
+            stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -358,17 +358,17 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'calls reporter if warnings', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -395,16 +395,16 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file2.js': [bugs: 'kinda']
 
-            stream = coffeelint.reporter('coffeelint/lib/reporters/raw')
+            stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -416,7 +416,7 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
         it 'calls reporter if errors', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -443,16 +443,16 @@ describe 'gulp-coffeelint', ->
                 warningCount: 0,
                 errorCount: 0,
 
-            stream = coffeelint.reporter('coffeelint/lib/reporters/raw')
+            stream = sut.coffeelint.reporter('coffeelint/lib/reporters/raw')
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file.js': [bugs: 'some']
@@ -464,29 +464,29 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'coffeelint-stylish\')', ->
-        coffeelint = null
-        publishStub = null
-        spiedReporter = null
+        sut =
+            coffeelint: null
+            publishStub: null
+            spiedReporter: null
 
         beforeEach ->
-            selectedReporter = require 'coffeelint-stylish'
-            spiedReporter = sinon.spy selectedReporter
+            sut.spiedReporter = sinon.spy require 'coffeelint-stylish'
             proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint-stylish': spiedReporter
+                'coffeelint-stylish': sut.spiedReporter
 
             # SUT
-            coffeelint = proxyquire '../',
+            sut.coffeelint = proxyquire '../',
                 './lib/reporter': proxyReportHandler
 
-            publishStub = sinon.stub spiedReporter.prototype, 'publish'
+            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
-            spiedReporter.resetHistory()
-            spiedReporter.prototype.publish.restore()
+            sut.spiedReporter.resetHistory()
+            sut.spiedReporter.prototype.publish.restore()
 
         it 'should pass through a file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -494,7 +494,7 @@ describe 'gulp-coffeelint', ->
                 base: './test/fixture/',
                 contents: Buffer.from 'sure()'
 
-            stream = coffeelint.reporter('coffeelint-stylish')
+            stream = sut.coffeelint.reporter 'coffeelint-stylish'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -503,17 +503,17 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'calls reporter if warnings', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -540,16 +540,16 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file2.js': [bugs: 'kinda']
 
-            stream = coffeelint.reporter('coffeelint-stylish')
+            stream = sut.coffeelint.reporter 'coffeelint-stylish'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -561,7 +561,7 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
         it 'calls reporter if errors', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -588,16 +588,16 @@ describe 'gulp-coffeelint', ->
                 warningCount: 0,
                 errorCount: 0,
 
-            stream = coffeelint.reporter('coffeelint-stylish')
+            stream = sut.coffeelint.reporter 'coffeelint-stylish'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                spiedReporter.callCount.should.equal 1
-                publishStub.callCount.should.equal 1
-                callArgs = spiedReporter.firstCall.args
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
                 (should callArgs).eql [
                     paths:
                         'file.js': [bugs: 'some']
@@ -609,14 +609,14 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'fail\')', ->
-        coffeelint = null
+        sut = coffeelint: null
 
         beforeEach ->
             # SUT
-            coffeelint = require '../'
+            sut.coffeelint = require '../'
 
         it 'should pass through an okay file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -624,7 +624,7 @@ describe 'gulp-coffeelint', ->
                 base: './test/fixture/',
                 contents: Buffer.from 'sure()'
 
-            stream = coffeelint.reporter 'fail'
+            stream = sut.coffeelint.reporter 'fail'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -633,18 +633,18 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should not pass through a bad file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -654,7 +654,7 @@ describe 'gulp-coffeelint', ->
 
             fakeFile.coffeelint = success: false, results: [bugs: 'many']
 
-            stream = coffeelint.reporter 'fail'
+            stream = sut.coffeelint.reporter 'fail'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -663,22 +663,22 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.on 'error', ->
                 # prevent stream from throwing
                 undefined
 
             stream.once 'end', ->
-                dataCounter.should.equal 0
+                data.counter.should.equal 0
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'emits error if `file.coffeelint.success===false`', (done) ->
-            dataCounter = 0
-            errorCounter = 0
+            data  = counter: 0
+            error = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -696,19 +696,18 @@ describe 'gulp-coffeelint', ->
 
             fakeFile2.coffeelint = success: false, results: [bugs: 'many']
 
-
-            stream = coffeelint.reporter 'fail'
+            stream = sut.coffeelint.reporter 'fail'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                errorCounter.should.equal 1
+                data.counter.should.equal 2
+                error.counter.should.equal 1
                 done()
 
             stream.on 'error', (e) ->
-                ++errorCounter
+                ++error.counter
                 should.exist e
                 e.should.be.an.instanceof PluginError
                 e.should.have.property 'message'
@@ -720,14 +719,14 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'failOnWarning\')', ->
-        coffeelint = null
+        sut = coffeelint: null
 
         beforeEach ->
             # SUT
-            coffeelint = require '../'
+            sut.coffeelint = require '../'
 
         it 'should pass through an okay file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -735,7 +734,7 @@ describe 'gulp-coffeelint', ->
                 base: './test/fixture/',
                 contents: Buffer.from 'sure()'
 
-            stream = coffeelint.reporter 'failOnWarning'
+            stream = sut.coffeelint.reporter 'failOnWarning'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -744,18 +743,18 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should not pass through a bad file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -768,7 +767,7 @@ describe 'gulp-coffeelint', ->
                 errorCount: 1,
                 results: [bugs: 'some']
 
-            stream = coffeelint.reporter 'failOnWarning'
+            stream = sut.coffeelint.reporter 'failOnWarning'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -777,22 +776,22 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.on 'error', ->
                 # prevent stream from throwing
                 undefined
 
             stream.once 'end', ->
-                dataCounter.should.equal 0
+                data.counter.should.equal 0
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'emits error if `file.coffeelint.warningCount!==0`', (done) ->
-            dataCounter = 0
-            errorCounter = 0
+            data  = counter: 0
+            error = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -816,18 +815,18 @@ describe 'gulp-coffeelint', ->
                 errorCount: 0,
                 results: [bugs: 'kinda']
 
-            stream = coffeelint.reporter 'failOnWarning'
+            stream = sut.coffeelint.reporter 'failOnWarning'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
-                errorCounter.should.equal 1
+                data.counter.should.equal 2
+                error.counter.should.equal 1
                 done()
 
             stream.on 'error', (e) ->
-                ++errorCounter
+                ++error.counter
                 should.exist e
                 e.should.be.an.instanceof PluginError
                 e.should.have.property 'message'
