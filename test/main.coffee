@@ -383,21 +383,20 @@ describe 'gulp-coffeelint', ->
 
                 opt = max_line_length: {value: 1024, level: 'ignore'}
 
-                stream_one = coffeelint opt: opt
-                stream_two = coffeelint opt: opt
+                stream = coffeelint opt: opt
 
-                stream_two.on 'data', (newFile) ->
+                stream.on 'data', (newFile) ->
                     ++dataCounter
                     should.exist newFile.coffeelint
                     should.exist newFile.coffeelint.opt
                     newFile.coffeelint.opt.should.eql opt
 
-                stream_two.once 'end', ->
+                stream.once 'end', ->
                     dataCounter.should.equal 1
                     done()
 
-                stream_two.write fakeFile
-                stream_two.end()
+                stream.write fakeFile
+                stream.end()
 
 
 
@@ -406,7 +405,7 @@ describe 'gulp-coffeelint', ->
             describe 'are thrown', ->
                 it 'if custom rule is not of type function', (done) ->
                     try
-                        stream = coffeelint ['This ain\'t no function']
+                        coffeelint ['This ain\'t no function']
                     catch e
                         should(e.plugin).equal PLUGIN_NAME
                         should(e.message).equal ERR_MSG.RULE
@@ -414,7 +413,7 @@ describe 'gulp-coffeelint', ->
 
                 it 'if config (passed as String) cannot be loaded', (done) ->
                     try
-                        stream = coffeelint ''
+                        coffeelint ''
                     catch e
                         should(e.plugin).equal PLUGIN_NAME
                         should(e.message).containEql ERR_MSG.CONFIG
