@@ -1,3 +1,27 @@
+#-----------------------------------------------------------------------------#
+#
+#  gulp-coffeelint Gulp configuration
+#
+#  Valid Targets:
+#  -------------
+#
+#    default    - Compiles to Javascript and watches for changes; runs the
+#                 test suite after any change.
+#
+#    test       - Compiles to Javascripot and runs the test suite once.
+#
+#    clean      - Removes the compiled Javascript and coverage output.
+#
+#    coffee     - Compiles to Javascript.
+#
+#    coffeelint - Lints the linter with itself. So meta....
+#
+#-----------------------------------------------------------------------------#
+
+#-----------------------------------------------------------------------------#
+# Imports
+#-----------------------------------------------------------------------------#
+
 coffee = require 'gulp-coffee'
 del    = require 'del'
 lint   = require './index.coffee'
@@ -11,34 +35,50 @@ lint   = require './index.coffee'
     spawn
 } = require 'child_process'
 
-# compile `index.coffee` and `lib/*.coffee` files
+#-----------------------------------------------------------------------------#
+# Compile the linter to Javascript.
+#-----------------------------------------------------------------------------#
 
 compile = ->
     return src ['{,lib/}*.coffee', '!gulpfile.coffee']
         .pipe coffee bare: true
         .pipe dest './'
 
-# remove `index.js`, `lib/*.js` and `coverage` dir
+#-----------------------------------------------------------------------------#
+# Delete the compiled Javascript and coverage output.
+#-----------------------------------------------------------------------------#
 
 clean = -> del ['index.js', 'lib/*.js', 'coverage']
 
-# run tests
+#-----------------------------------------------------------------------------#
+# Run the test suite.
+#-----------------------------------------------------------------------------#
 
 test = -> spawn 'npm', ['test'], stdio: 'inherit'
 
-# run `gulp-coffeelint` for testing purposes
+#-----------------------------------------------------------------------------#
+# Use the linter to lint the linter.
+#-----------------------------------------------------------------------------#
 
 coffeelint = ->
     return src './{,lib/}*.coffee'
         .pipe lint()
         .pipe lint.reporter()
 
-# development
+#-----------------------------------------------------------------------------#
+# Watch for changes and run the test suite if anything changes.
+#-----------------------------------------------------------------------------#
 
 develop = -> watch ['./{,lib/,test/,test/fixtures/}*{.coffee,.json}'], test
+
+#-----------------------------------------------------------------------------#
+# Exports
+#-----------------------------------------------------------------------------#
 
 exports.default    = series compile, develop
 exports.test       = series compile, test
 exports.clean      = clean
 exports.coffee     = compile
 exports.coffeelint = coffeelint
+
+#-----------------------------------------------------------------------------#
