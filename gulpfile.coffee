@@ -3,7 +3,6 @@
 coffee = require 'gulp-coffee'
 colors = require 'ansi-colors'
 del    = require 'del'
-fs     = require 'fs'
 lint   = require './index.coffee'
 {
     src,
