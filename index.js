@@ -63,11 +63,10 @@ coffeelintPlugin = function() {
     }
   }
   return through2.obj(function(file, enc, cb) {
-    var errorReport, fileLiterate, fileOpt, output, results;
+    var errorReport, fileLiterate, fileOpt, output;
     // `file` specific options
     fileOpt = opt;
     fileLiterate = literate;
-    results = null;
     output = null;
     // pass along
     if (file.isNull()) {
