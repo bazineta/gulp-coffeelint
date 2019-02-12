@@ -50,7 +50,6 @@ coffeelintPlugin = ->
         fileOpt = opt
         fileLiterate = literate
 
-        results = null
         output = null
 
         # pass along
