@@ -22,7 +22,7 @@ coffeelint = require '../'
 describe 'gulp-coffeelint', ->
     describe 'coffeelint()', ->
         it 'should pass through empty file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -39,17 +39,17 @@ describe 'gulp-coffeelint', ->
                 should.not.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should pass through the file', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -66,18 +66,18 @@ describe 'gulp-coffeelint', ->
                 should.exist(newFile.contents)
                 newFile.path.should.equal 'test/fixture/file.js'
                 newFile.relative.should.equal 'file.js'
-                ++dataCounter
+                ++data.counter
 
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should pass through two files', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -95,10 +95,10 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint()
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
 
             stream.once 'end', ->
-                dataCounter.should.equal 2
+                data.counter.should.equal 2
                 done()
 
             stream.write fakeFile
@@ -106,7 +106,7 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
         it 'should send success status', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -117,20 +117,20 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint {}
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.success
                 newFile.coffeelint.success.should.be.true
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should send success status even when there are warnings', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -141,7 +141,7 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint 'no_debugger': 'level': 'warn'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.success
                 should.exist newFile.coffeelint.warningCount
@@ -151,14 +151,14 @@ describe 'gulp-coffeelint', ->
                 newFile.coffeelint.errorCount.should.eql(0)
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should send bad results', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -169,7 +169,7 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint {}
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.opt
                 newFile.coffeelint.opt.should.be.empty
@@ -191,14 +191,14 @@ describe 'gulp-coffeelint', ->
                 should.exist fileReport[0].rule
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should load explicitly set config and send results', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -209,7 +209,7 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint path.join __dirname, './coffeelint.json'
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.opt
                 newFile.coffeelint.opt.should.not.be.empty
@@ -234,14 +234,14 @@ describe 'gulp-coffeelint', ->
                 should.exist fileReport[0].context
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'optFile param should overrule opt param', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -255,7 +255,7 @@ describe 'gulp-coffeelint', ->
             )
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.opt
                 newFile.coffeelint.opt.should.not.be.empty
@@ -280,14 +280,14 @@ describe 'gulp-coffeelint', ->
                 should.exist fileReport[0].context
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should load config as cli does and send results', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -298,7 +298,7 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint()
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.opt
                 newFile.coffeelint.opt.should.not.be.empty
@@ -323,14 +323,14 @@ describe 'gulp-coffeelint', ->
                 should.exist fileReport[0].context
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
             stream.end()
 
         it 'should load custom rule', (done) ->
-            dataCounter = 0
+            data = counter: 0
 
             fakeFile = new vinyl
                 path: './test/fixture/file.js',
@@ -341,7 +341,7 @@ describe 'gulp-coffeelint', ->
             stream = coffeelint({}, [customRule])
 
             stream.on 'data', (newFile) ->
-                ++dataCounter
+                ++data.counter
                 should.exist newFile.coffeelint
                 should.exist newFile.coffeelint.opt
                 newFile.coffeelint.opt.should.be.empty
@@ -365,7 +365,7 @@ describe 'gulp-coffeelint', ->
                 )
 
             stream.once 'end', ->
-                dataCounter.should.equal 1
+                data.counter.should.equal 1
                 done()
 
             stream.write fakeFile
@@ -373,7 +373,7 @@ describe 'gulp-coffeelint', ->
 
         describe 'issue #12', ->
             it 'args-js may modify the `params` parameter', (done) ->
-                dataCounter = 0
+                data = counter: 0
 
                 fakeFile = new vinyl
                     path: './test/fixture/file.js',
@@ -386,13 +386,13 @@ describe 'gulp-coffeelint', ->
                 stream = coffeelint opt: opt
 
                 stream.on 'data', (newFile) ->
-                    ++dataCounter
+                    ++data.counter
                     should.exist newFile.coffeelint
                     should.exist newFile.coffeelint.opt
                     newFile.coffeelint.opt.should.eql opt
 
                 stream.once 'end', ->
-                    dataCounter.should.equal 1
+                    data.counter.should.equal 1
                     done()
 
                 stream.write fakeFile
