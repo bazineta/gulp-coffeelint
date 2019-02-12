@@ -5,7 +5,6 @@ colors = require 'ansi-colors'
 del    = require 'del'
 fs     = require 'fs'
 lint   = require './index.coffee'
-log    = require 'fancy-log'
 {
     src,
     dest,
