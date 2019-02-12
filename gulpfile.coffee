@@ -31,7 +31,7 @@ test = -> spawn 'npm', ['test'], stdio: 'inherit'
 
 # run `gulp-coffeelint` for testing purposes
 
-lint = ->
+coffeelint = ->
     return src './{,lib/,test/,test/fixtures/}*.coffee'
         .pipe lint()
         .pipe lint.reporter()
@@ -44,4 +44,4 @@ exports.default    = series compile, dev
 exports.test       = series compile, test
 exports.clean      = clean
 exports.coffee     = compile
-exports.coffeelint = lint
+exports.coffeelint = coffeelint
