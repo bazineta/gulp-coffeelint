@@ -28,9 +28,9 @@
     "changelog": "conventional-changelog -p angular -i changelog.md -w"
   },
   "dependencies": {
-    "args-js": "^0.10.5",
-    "coffeelint": "^2.0.6",
-    "coffeelint-stylish": "^0.1.1",
+    "args-js": "^0.10.12",
+    "coffeelint": "^2.1.0",
+    "coffeelint-stylish": "^0.1.2",
     "plugin-error": "^1.0.1",
     "through2": "^3.0.0"
   },

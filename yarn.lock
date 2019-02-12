@@ -224,7 +224,7 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
-args-js@^0.10.5:
+args-js@^0.10.12:
   version "0.10.12"
   resolved "https://registry.yarnpkg.com/args-js/-/args-js-0.10.12.tgz#a327aea80e41072a3d85f9c274db6511eb95e49c"
   integrity sha1-oyeuqA5BByo9hfnCdNtlEeuV5Jw=
@@ -647,7 +647,7 @@ code-point-at@^1.0.0:
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
 
-coffeelint-stylish@^0.1.1:
+coffeelint-stylish@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/coffeelint-stylish/-/coffeelint-stylish-0.1.2.tgz#ab501a64435e231706da13a27527ab695700abc9"
   integrity sha1-q1AaZENeIxcG2hOidSeraVcAq8k=
@@ -655,7 +655,7 @@ coffeelint-stylish@^0.1.1:
     chalk "^1.0.0"
     text-table "^0.2.0"
 
-coffeelint@^2.0.6:
+coffeelint@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/coffeelint/-/coffeelint-2.1.0.tgz#af65df3634e999d9ac01480736c36d3cd2f5dad8"
   integrity sha1-r2XfNjTpmdmsAUgHNsNtPNL12tg=
