@@ -143,11 +143,6 @@ ansi-colors@^1.0.1:
   dependencies:
     ansi-wrap "^0.1.0"
 
-ansi-colors@^3.2.3:
-  version "3.2.3"
-  resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-3.2.3.tgz#57d35b8686e851e2cc04c403f1c00203976a1813"
-  integrity sha512-LEHHyuhlPY3TmuUYMh2oz89lTShfvgbmzaBcxve9t/9Wuy7Dwf4yoAKcND7KFT1HAQfqZ12qtc+DUrBMeKF9nw==
-
 ansi-gray@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/ansi-gray/-/ansi-gray-0.1.1.tgz#2962cf54ec9792c48510a3deb524436861ef7251"
@@ -672,7 +667,14 @@ coffeelint@^2.0.6:
     resolve "^0.6.3"
     strip-json-comments "^1.0.2"
 
-coffeescript@^2.0.1, coffeescript@^2.1.0:
+coffeescope2@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/coffeescope2/-/coffeescope2-0.5.1.tgz#4ab02d9c78a2ed9fee60b0e2573ede89cf68aaf4"
+  integrity sha512-QPD8+loa8BqNhq70P3WFM/G9Ilj2Q9Jk6fDFbBdjxdjiFnirbwktkZKK3SauvsnoyqaqWRovAYa9sLttqSa3zw==
+  dependencies:
+    globals "^11.5.0"
+
+coffeescript@^2.1.0, coffeescript@^2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/coffeescript/-/coffeescript-2.3.2.tgz#e854a7020dfe47b7cf4dd412042e32ef1e269810"
   integrity sha512-YObiFDoukx7qPBi/K0kUKyntEZDfBQiqs/DbrR1xzASKOBjGT7auD85/DiPeRr9k++lRj7l3uA9TNMLfyfcD/Q==
@@ -1644,7 +1646,7 @@ global-prefix@^1.0.1:
     is-windows "^1.0.1"
     which "^1.2.14"
 
-globals@^11.1.0:
+globals@^11.1.0, globals@^11.5.0:
   version "11.11.0"
   resolved "https://registry.yarnpkg.com/globals/-/globals-11.11.0.tgz#dcf93757fa2de5486fbeed7118538adf789e9c2e"
   integrity sha512-WHq43gS+6ufNOEqlrDBxVEbb8ntfXrfAUU2ZOpCxrBdGKW3gyv8mCxAfIBD0DroPKGrJ2eSsXsLtY9MPntsyTw==
