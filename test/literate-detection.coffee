@@ -1,7 +1,4 @@
-'use strict'
-
 # module dependencies
-path   = require 'path'
 should = require 'should'
 vinyl  = require 'vinyl'
 
