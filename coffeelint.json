@@ -73,5 +73,29 @@
     "no_implicit_braces": {
         "level": "ignore",
         "strict": true
-    }
+    },
+    "check_scope": {
+        "module": "coffeescope2",
+        "level": "warn",
+        "environments": [
+          "es2015",
+          "browser",
+          "commonjs",
+          "mocha",
+          "node"
+        ],
+        "overwrite": true,
+        "shadow": false,
+        "shadow_builtins": false,
+        "shadow_exceptions": [
+          "callback",
+          "err",
+          "next"
+        ],
+        "undefined": true,
+        "hoist_local": true,
+        "hoist_parent": true,
+        "unused_variables": true,
+        "unused_arguments": false
+      }
 }
