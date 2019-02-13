@@ -30,20 +30,14 @@ describe 'gulp-coffeelint', ->
 
     describe 'running coffeelint.reporter()', ->
         sut =
-            coffeelint: null
-            publishStub: null
+            coffeelint:    null
+            publishStub:   null
             spiedReporter: null
 
         beforeEach ->
             sut.spiedReporter   = sinon.spy require 'coffeelint-stylish'
-            proxyReportHandler  = proxyquire '../lib/reporter',
-                'coffeelint-stylish': sut.spiedReporter
-
-            # SUT
-            sut.coffeelint = proxyquire '../',
-                './lib/reporter': proxyReportHandler
-
-            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
+            sut.coffeelint      = proxyquire '../', 'coffeelint-stylish': sut.spiedReporter
+            sut.publishStub     = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
@@ -54,9 +48,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             stream = sut.coffeelint.reporter()
@@ -81,9 +75,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
@@ -92,15 +86,15 @@ describe 'gulp-coffeelint', ->
                 errorCount: 0
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 2,
-                errorCount: 0,
+                success:      true
+                warningCount: 2
+                errorCount:   0
                 results:
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -129,29 +123,29 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 2,
+                success:      true
+                warningCount: 0
+                errorCount:   2
                 results:
                     paths:
                         'file.js': [bugs: 'some']
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0,
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             stream = sut.coffeelint.reporter()
 
@@ -175,20 +169,14 @@ describe 'gulp-coffeelint', ->
 
     describe 'running coffeelint.reporter(\'raw\')', ->
         sut =
-            coffeelint: null
-            publishStub: null
+            coffeelint:    null
+            publishStub:   null
             spiedReporter: null
 
         beforeEach ->
             sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
-            proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint/lib/reporters/raw': sut.spiedReporter
-
-            # SUT
-            sut.coffeelint = proxyquire '../',
-                './lib/reporter': proxyReportHandler
-
-            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
+            sut.coffeelint    = proxyquire '../', 'coffeelint/lib/reporters/raw': sut.spiedReporter
+            sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
@@ -199,9 +187,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             stream = sut.coffeelint.reporter('raw')
@@ -226,9 +214,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
@@ -237,15 +225,15 @@ describe 'gulp-coffeelint', ->
                 errorCount: 0
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 2,
-                errorCount: 0,
+                success:      true
+                warningCount: 2
+                errorCount:   0
                 results:
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -274,29 +262,29 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 2,
+                success:      true
+                warningCount: 0
+                errorCount:   2
                 results:
                     paths:
                         'file.js': [bugs: 'some']
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0,
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             stream = sut.coffeelint.reporter('raw')
 
@@ -320,20 +308,14 @@ describe 'gulp-coffeelint', ->
 
     describe 'running coffeelint.reporter(\'coffeelint/lib/reporters/raw\')', ->
         sut =
-            coffeelint: null
-            publishStub: null
+            coffeelint:    null
+            publishStub:   null
             spiedReporter: null
 
         beforeEach ->
             sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
-            proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint/lib/reporters/raw': sut.spiedReporter
-
-            # SUT
-            sut.coffeelint = proxyquire '../',
-                './lib/reporter': proxyReportHandler
-
-            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
+            sut.coffeelint    = proxyquire '../', 'coffeelint/lib/reporters/raw': sut.spiedReporter
+            sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
@@ -382,9 +364,9 @@ describe 'gulp-coffeelint', ->
                 errorCount: 0
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
@@ -419,9 +401,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
@@ -433,9 +415,9 @@ describe 'gulp-coffeelint', ->
                         'file.js': [bugs: 'some']
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
@@ -443,7 +425,7 @@ describe 'gulp-coffeelint', ->
                 warningCount: 0,
                 errorCount: 0,
 
-            stream = sut.coffeelint.reporter('coffeelint/lib/reporters/raw')
+            stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
 
             stream.on 'data', (newFile) ->
                 ++data.counter
@@ -465,20 +447,14 @@ describe 'gulp-coffeelint', ->
 
     describe 'running coffeelint.reporter(\'coffeelint-stylish\')', ->
         sut =
-            coffeelint: null
-            publishStub: null
+            coffeelint:    null
+            publishStub:   null
             spiedReporter: null
 
         beforeEach ->
             sut.spiedReporter = sinon.spy require 'coffeelint-stylish'
-            proxyReportHandler = proxyquire '../lib/reporter',
-                'coffeelint-stylish': sut.spiedReporter
-
-            # SUT
-            sut.coffeelint = proxyquire '../',
-                './lib/reporter': proxyReportHandler
-
-            sut.publishStub = sinon.stub sut.spiedReporter.prototype, 'publish'
+            sut.coffeelint    = proxyquire '../', 'coffeelint-stylish': sut.spiedReporter
+            sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
         afterEach ->
@@ -489,9 +465,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             stream = sut.coffeelint.reporter 'coffeelint-stylish'
@@ -516,26 +492,26 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 2,
-                errorCount: 0,
+                success:      true
+                warningCount: 2
+                errorCount:   0
                 results:
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -564,29 +540,29 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 2,
+                success:      true
+                warningCount: 0
+                errorCount:   2
                 results:
                     paths:
                         'file.js': [bugs: 'some']
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0,
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             stream = sut.coffeelint.reporter 'coffeelint-stylish'
 
@@ -619,9 +595,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             stream = sut.coffeelint.reporter 'fail'
@@ -647,12 +623,14 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
-            fakeFile.coffeelint = success: false, results: [bugs: 'many']
+            fakeFile.coffeelint =
+                success: false
+                results: [bugs: 'many']
 
             stream = sut.coffeelint.reporter 'fail'
 
@@ -681,20 +659,22 @@ describe 'gulp-coffeelint', ->
             error = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint = success: true
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
-            fakeFile2.coffeelint = success: false, results: [bugs: 'many']
+            fakeFile2.coffeelint =
+                success: false
+                results: [bugs: 'many']
 
             stream = sut.coffeelint.reporter 'fail'
 
@@ -729,9 +709,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             stream = sut.coffeelint.reporter 'failOnWarning'
@@ -757,14 +737,14 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             fakeFile.coffeelint =
-                warningCount: 0,
-                errorCount: 1,
+                warningCount: 0
+                errorCount:   1
                 results: [bugs: 'some']
 
             stream = sut.coffeelint.reporter 'failOnWarning'
@@ -794,25 +774,25 @@ describe 'gulp-coffeelint', ->
             error = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             fakeFile2 = new vinyl
-                path: './test/fixture/file2.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                warningCount: 1,
-                errorCount: 0,
+                warningCount: 1
+                errorCount:   0,
                 results: [bugs: 'kinda']
 
             stream = sut.coffeelint.reporter 'failOnWarning'

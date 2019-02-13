@@ -1,27 +1,104 @@
-fs = require 'fs'
-through2 = require 'through2'
-Args = require 'args-js' # main entry missing in `args-js` package
-coffeelint = require 'coffeelint'
+#-----------------------------------------------------------------------------#
+# Imports
+#-----------------------------------------------------------------------------#
+
+Args        = require 'args-js'
+PluginError = require 'plugin-error'
+fs          = require 'fs'
+through2    = require 'through2'
+coffeelint  = require 'coffeelint'
 {getConfig} = require 'coffeelint/lib/configfinder'
 
-# `reporter`
-reporter = require './lib/reporter'
+#-----------------------------------------------------------------------------#
+# Locals
+#-----------------------------------------------------------------------------#
 
-# common utils
-{isLiterate, createPluginError, formatOutput} = require './lib/utils'
+createPluginError = (message) -> new PluginError 'gulp-coffeelint', message
 
-coffeelintPlugin = ->
-    # params for `args-js`
-    params = [
-        {optFile: Args.STRING | Args.Optional}
-        {opt: Args.OBJECT | Args.Optional}
-        {literate: Args.BOOL | Args.Optional}
-        {rules: Args.ARRAY | Args.Optional, _default: []}
-    ]
+isLiterate = (file) -> /\.(litcoffee|coffee\.md)$/.test file
+
+formatOutput = (errorReport, opt, literate) ->
+
+    {errorCount, warningCount} = errorReport.getSummary()
+
+    return {
+        errorCount
+        warningCount
+        opt
+        literate
+        success: errorCount is 0
+        results: errorReport
+    }
+
+reporterStream = (reporterType) ->
+    return through2.obj (file, enc, cb) ->
+        c = file.coffeelint
+        # nothing to report or no errors AND no warnings
+        if not c or c.errorCount is c.warningCount is 0
+            @push file
+            return cb()
+
+        # report
+        new reporterType(file.coffeelint.results).publish()
+
+        # pass along
+        @push file
+        cb()
+
+failReporter = ->
+    return through2.obj (file, enc, cb) ->
+        # nothing to report or no errors
+        if not file.coffeelint or file.coffeelint.success
+            @push file
+            return cb()
+
+        # fail
+        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
+        cb()
+
+failOnWarningReporter = ->
+    return through2.obj (file, enc, cb) ->
+        c = file.coffeelint
+        # nothing to report or no errors AND no warnings
+        if not c or c.errorCount is c.warningCount is 0
+            @push file
+            return cb()
+
+        # fail
+        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
+        cb()
+
+loadReporter = (type) ->
+
+    return type if typeof type is 'function'
+
+    type ?= 'coffeelint-stylish'
+
+    try return require "coffeelint/lib/reporters/#{type}"
+    try return require type
+
+    return throw createPluginError "#{type} is not a valid reporter"
+
+reporter = (type) ->
+    return switch type
+        when 'fail'          then failReporter()
+        when 'failOnWarning' then failOnWarningReporter()
+        else                      reporterStream loadReporter type
+
+#-----------------------------------------------------------------------------#
+# Plugin
+#-----------------------------------------------------------------------------#
+
+plugin = ->
 
     # parse arguments
     try
-        {opt, optFile, literate, rules} = Args params, arguments
+        {opt, optFile, literate, rules} = Args [
+            {optFile:  Args.STRING | Args.Optional}
+            {opt:      Args.OBJECT | Args.Optional}
+            {literate: Args.BOOL   | Args.Optional}
+            {rules:    Args.ARRAY  | Args.Optional, _default: []}
+        ], arguments
     catch e
         throw createPluginError e
 
@@ -29,7 +106,7 @@ coffeelintPlugin = ->
     # e.g. `coffeelintPlugin [-> myCustomRule]`
     if Array.isArray opt
         rules = opt
-        opt = undefined
+        opt   = undefined
 
     # register custom rules
     rules.map (rule) ->
@@ -47,10 +124,8 @@ coffeelintPlugin = ->
 
     through2.obj (file, enc, cb) ->
         # `file` specific options
-        fileOpt = opt
+        fileOpt      = opt
         fileLiterate = literate
-
-        output = null
 
         # pass along
         if file.isNull()
@@ -63,12 +138,12 @@ coffeelintPlugin = ->
 
         # if `opt` is not already a JSON `Object`,
         # get config like `coffeelint` cli does.
-        fileOpt = getConfig file.path if fileOpt is undefined
+        fileOpt ?= getConfig file.path
 
         # if `literate` is not given
         # check for file extension like
         # `coffeelint`cli does.
-        fileLiterate = isLiterate(file.path) if fileLiterate is undefined
+        fileLiterate ?= isLiterate file.path
 
         # get results `Array`
         # see http://www.coffeelint.org/#api
@@ -81,12 +156,17 @@ coffeelintPlugin = ->
             fileLiterate
         )
 
-        output = formatOutput errorReport, fileOpt, fileLiterate
-        file.coffeelint = output
+        file.coffeelint = formatOutput errorReport, fileOpt, fileLiterate
 
         @push file
         cb()
 
-coffeelintPlugin.reporter = reporter
+plugin.reporter = reporter
 
-module.exports = coffeelintPlugin
+#-----------------------------------------------------------------------------#
+# Exports
+#-----------------------------------------------------------------------------#
+
+module.exports = plugin
+
+#-----------------------------------------------------------------------------#

@@ -25,11 +25,10 @@
         "allowed_in_empty_lines": false
     },
     "colon_assignment_spacing": {
-        "name": "colon_assignment_spacing",
-        "level": "error",
+        "level": "ignore",
         "spacing": {
-            "left": 0,
-            "right": 1
+          "left": 0,
+          "right": 0
         }
     },
     "space_operators": {
@@ -51,6 +50,9 @@
     },
     "empty_constructor_needs_parens": {
         "level": "error"
+    },
+    "max_line_length": {
+        "level": "ignore"
     },
     "no_empty_param_list": {
         "level": "error"

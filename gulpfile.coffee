@@ -40,7 +40,7 @@ lint   = require './index.coffee'
 #-----------------------------------------------------------------------------#
 
 compile = ->
-    return src ['{,lib/}*.coffee', '!gulpfile.coffee']
+    return src 'index.coffee'
         .pipe coffee bare: true
         .pipe dest './'
 
@@ -48,7 +48,7 @@ compile = ->
 # Delete the compiled Javascript and coverage output.
 #-----------------------------------------------------------------------------#
 
-clean = -> del ['index.js', 'lib/*.js', 'coverage']
+clean = -> del ['index.js', 'coverage']
 
 #-----------------------------------------------------------------------------#
 # Run the test suite.
@@ -61,7 +61,7 @@ test = -> spawn 'npm', ['test'], stdio: 'inherit'
 #-----------------------------------------------------------------------------#
 
 coffeelint = ->
-    return src './{,lib/}*.coffee'
+    return src 'index.coffee'
         .pipe lint()
         .pipe lint.reporter()
 
@@ -69,7 +69,7 @@ coffeelint = ->
 # Watch for changes and run the test suite if anything changes.
 #-----------------------------------------------------------------------------#
 
-develop = -> watch ['./{,lib/,test/,test/fixtures/}*{.coffee,.json}'], test
+develop = -> watch ['./{,test/,test/fixtures/}*{.coffee,.json}'], test
 
 #-----------------------------------------------------------------------------#
 # Exports

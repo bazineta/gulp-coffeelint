@@ -1,42 +1,138 @@
-var Args, coffeelint, coffeelintPlugin, createPluginError, formatOutput, fs, getConfig, isLiterate, reporter, through2;
+//-----------------------------------------------------------------------------#
+// Imports
+//-----------------------------------------------------------------------------#
+var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, formatOutput, fs, getConfig, isLiterate, loadReporter, plugin, reporter, reporterStream, through2;
+
+Args = require('args-js');
+
+PluginError = require('plugin-error');
 
 fs = require('fs');
 
 through2 = require('through2');
 
-Args = require('args-js'); // main entry missing in `args-js` package
-
 coffeelint = require('coffeelint');
 
 ({getConfig} = require('coffeelint/lib/configfinder'));
 
-// `reporter`
-reporter = require('./lib/reporter');
+//-----------------------------------------------------------------------------#
+// Locals
+//-----------------------------------------------------------------------------#
+createPluginError = function(message) {
+  return new PluginError('gulp-coffeelint', message);
+};
 
-// common utils
-({isLiterate, createPluginError, formatOutput} = require('./lib/utils'));
+isLiterate = function(file) {
+  return /\.(litcoffee|coffee\.md)$/.test(file);
+};
 
-coffeelintPlugin = function() {
-  var e, literate, opt, optFile, params, rules;
-  // params for `args-js`
-  params = [
-    {
-      optFile: Args.STRING | Args.Optional
-    },
-    {
-      opt: Args.OBJECT | Args.Optional
-    },
-    {
-      literate: Args.BOOL | Args.Optional
-    },
-    {
-      rules: Args.ARRAY | Args.Optional,
-      _default: []
+formatOutput = function(errorReport, opt, literate) {
+  var errorCount, warningCount;
+  ({errorCount, warningCount} = errorReport.getSummary());
+  return {
+    errorCount,
+    warningCount,
+    opt,
+    literate,
+    success: errorCount === 0,
+    results: errorReport
+  };
+};
+
+reporterStream = function(reporterType) {
+  return through2.obj(function(file, enc, cb) {
+    var c, ref;
+    c = file.coffeelint;
+    // nothing to report or no errors AND no warnings
+    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
+      this.push(file);
+      return cb();
     }
-  ];
+    // report
+    new reporterType(file.coffeelint.results).publish();
+    // pass along
+    this.push(file);
+    return cb();
+  });
+};
+
+failReporter = function() {
+  return through2.obj(function(file, enc, cb) {
+    // nothing to report or no errors
+    if (!file.coffeelint || file.coffeelint.success) {
+      this.push(file);
+      return cb();
+    }
+    // fail
+    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
+    return cb();
+  });
+};
+
+failOnWarningReporter = function() {
+  return through2.obj(function(file, enc, cb) {
+    var c, ref;
+    c = file.coffeelint;
+    // nothing to report or no errors AND no warnings
+    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
+      this.push(file);
+      return cb();
+    }
+    // fail
+    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
+    return cb();
+  });
+};
+
+loadReporter = function(type) {
+  if (typeof type === 'function') {
+    return type;
+  }
+  if (type == null) {
+    type = 'coffeelint-stylish';
+  }
+  try {
+    return require(`coffeelint/lib/reporters/${type}`);
+  } catch (error) {}
+  try {
+    return require(type);
+  } catch (error) {}
+  throw createPluginError(`${type} is not a valid reporter`);
+};
+
+reporter = function(type) {
+  switch (type) {
+    case 'fail':
+      return failReporter();
+    case 'failOnWarning':
+      return failOnWarningReporter();
+    default:
+      return reporterStream(loadReporter(type));
+  }
+};
+
+//-----------------------------------------------------------------------------#
+// Plugin
+//-----------------------------------------------------------------------------#
+plugin = function() {
+  var e, literate, opt, optFile, rules;
   try {
     // parse arguments
-    ({opt, optFile, literate, rules} = Args(params, arguments));
+    ({opt, optFile, literate, rules} = Args([
+      {
+        optFile: Args.STRING | Args.Optional
+      },
+      {
+        opt: Args.OBJECT | Args.Optional
+      },
+      {
+        literate: Args.BOOL | Args.Optional
+      },
+      {
+        rules: Args.ARRAY | Args.Optional,
+        _default: []
+      }
+    ], arguments));
   } catch (error) {
     e = error;
     throw createPluginError(e);
@@ -63,11 +159,10 @@ coffeelintPlugin = function() {
     }
   }
   return through2.obj(function(file, enc, cb) {
-    var errorReport, fileLiterate, fileOpt, output;
+    var errorReport, fileLiterate, fileOpt;
     // `file` specific options
     fileOpt = opt;
     fileLiterate = literate;
-    output = null;
     // pass along
     if (file.isNull()) {
       this.push(file);
@@ -77,15 +172,15 @@ coffeelintPlugin = function() {
       this.emit('error', createPluginError('Streaming not supported'));
       return cb();
     }
-    if (fileOpt === void 0) {
-      // if `opt` is not already a JSON `Object`,
-      // get config like `coffeelint` cli does.
+    // if `opt` is not already a JSON `Object`,
+    // get config like `coffeelint` cli does.
+    if (fileOpt == null) {
       fileOpt = getConfig(file.path);
     }
-    if (fileLiterate === void 0) {
-      // if `literate` is not given
-      // check for file extension like
-      // `coffeelint`cli does.
+    // if `literate` is not given
+    // check for file extension like
+    // `coffeelint`cli does.
+    if (fileLiterate == null) {
       fileLiterate = isLiterate(file.path);
     }
     // get results `Array`
@@ -93,13 +188,17 @@ coffeelintPlugin = function() {
     // for format
     errorReport = coffeelint.getErrorReport();
     errorReport.lint(file.relative, file.contents.toString(), fileOpt, fileLiterate);
-    output = formatOutput(errorReport, fileOpt, fileLiterate);
-    file.coffeelint = output;
+    file.coffeelint = formatOutput(errorReport, fileOpt, fileLiterate);
     this.push(file);
     return cb();
   });
 };
 
-coffeelintPlugin.reporter = reporter;
+plugin.reporter = reporter;
 
-module.exports = coffeelintPlugin;
+//-----------------------------------------------------------------------------#
+// Exports
+//-----------------------------------------------------------------------------#
+module.exports = plugin;
+
+//-----------------------------------------------------------------------------#
