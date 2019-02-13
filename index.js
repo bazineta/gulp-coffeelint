@@ -1,4 +1,4 @@
-var Args, coffeelint, coffeelintPlugin, configfinder, createPluginError, formatOutput, fs, isLiterate, reporter, through2;
+var Args, coffeelint, coffeelintPlugin, createPluginError, formatOutput, fs, getConfig, isLiterate, reporter, through2;
 
 fs = require('fs');
 
@@ -8,7 +8,7 @@ Args = require('args-js'); // main entry missing in `args-js` package
 
 coffeelint = require('coffeelint');
 
-configfinder = require('coffeelint/lib/configfinder');
+({getConfig} = require('coffeelint/lib/configfinder'));
 
 // `reporter`
 reporter = require('./lib/reporter');
@@ -80,7 +80,7 @@ coffeelintPlugin = function() {
     if (fileOpt === void 0) {
       // if `opt` is not already a JSON `Object`,
       // get config like `coffeelint` cli does.
-      fileOpt = configfinder.getConfig(file.path);
+      fileOpt = getConfig(file.path);
     }
     if (fileLiterate === void 0) {
       // if `literate` is not given

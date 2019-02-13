@@ -2,7 +2,7 @@ fs = require 'fs'
 through2 = require 'through2'
 Args = require 'args-js' # main entry missing in `args-js` package
 coffeelint = require 'coffeelint'
-configfinder = require 'coffeelint/lib/configfinder'
+{getConfig} = require 'coffeelint/lib/configfinder'
 
 # `reporter`
 reporter = require './lib/reporter'
@@ -63,7 +63,7 @@ coffeelintPlugin = ->
 
         # if `opt` is not already a JSON `Object`,
         # get config like `coffeelint` cli does.
-        fileOpt = configfinder.getConfig file.path if fileOpt is undefined
+        fileOpt = getConfig file.path if fileOpt is undefined
 
         # if `literate` is not given
         # check for file extension like

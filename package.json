@@ -22,9 +22,9 @@
     "lib/*.js"
   ],
   "scripts": {
-    "prepublish": "gulp coffee",
+    "prepublishOnly": "gulp coffee",
     "test": "coffeelint gulpfile.coffee index.coffee lib test -f ./coffeelint.json && nyc --require coffeescript/register --extension .coffee mocha --report lcovonly --reporter spec -- ./test/*.coffee",
-    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "coveralls": "cat ./coverage/lcov.info | coveralls",
     "changelog": "conventional-changelog -p angular -i changelog.md -w"
   },
   "dependencies": {
