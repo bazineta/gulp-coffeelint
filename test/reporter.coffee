@@ -14,10 +14,10 @@ ERR_MSG =
 describe 'gulp-coffeelint', ->
 
     describe 'coffeelint.reporter function', ->
-        sut = coffeelint: null
+
+        sut = {}
 
         beforeEach ->
-            # SUT
             sut.coffeelint = require '../'
 
         it 'throws when passed invalid reporter type', (done) ->
@@ -29,10 +29,8 @@ describe 'gulp-coffeelint', ->
                 done()
 
     describe 'running coffeelint.reporter()', ->
-        sut =
-            coffeelint:    null
-            publishStub:   null
-            spiedReporter: null
+
+        sut = {}
 
         beforeEach ->
             sut.spiedReporter   = sinon.spy require 'coffeelint-stylish'
@@ -81,9 +79,9 @@ describe 'gulp-coffeelint', ->
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             fakeFile2 = new vinyl
                 path:    './test/fixture/file2.js'
@@ -168,10 +166,8 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'raw\')', ->
-        sut =
-            coffeelint:    null
-            publishStub:   null
-            spiedReporter: null
+
+        sut = {}
 
         beforeEach ->
             sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
@@ -220,9 +216,9 @@ describe 'gulp-coffeelint', ->
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             fakeFile2 = new vinyl
                 path:    './test/fixture/file2.js'
@@ -307,10 +303,8 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'coffeelint/lib/reporters/raw\')', ->
-        sut =
-            coffeelint:    null
-            publishStub:   null
-            spiedReporter: null
+
+        sut = {}
 
         beforeEach ->
             sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
@@ -326,9 +320,9 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
             stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
@@ -353,15 +347,15 @@ describe 'gulp-coffeelint', ->
             data = counter: 0
 
             fakeFile = new vinyl
-                path: './test/fixture/file.js',
-                cwd: './test/',
-                base: './test/fixture/',
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             fakeFile2 = new vinyl
                 path:    './test/fixture/file2.js'
@@ -370,9 +364,9 @@ describe 'gulp-coffeelint', ->
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 2,
-                errorCount: 0,
+                success:      true
+                warningCount: 2
+                errorCount:   0
                 results:
                     paths:
                         'file2.js': [bugs: 'kinda']
@@ -407,9 +401,9 @@ describe 'gulp-coffeelint', ->
                 contents: Buffer.from 'success()'
 
             fakeFile.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 2,
+                success:      true
+                warningCount: 0
+                errorCount:   2
                 results:
                     paths:
                         'file.js': [bugs: 'some']
@@ -421,9 +415,9 @@ describe 'gulp-coffeelint', ->
                 contents: Buffer.from 'yeahmetoo()'
 
             fakeFile2.coffeelint =
-                success: true,
-                warningCount: 0,
-                errorCount: 0,
+                success:      true
+                warningCount: 0
+                errorCount:   0
 
             stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
 
@@ -446,10 +440,8 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'coffeelint-stylish\')', ->
-        sut =
-            coffeelint:    null
-            publishStub:   null
-            spiedReporter: null
+
+        sut = {}
 
         beforeEach ->
             sut.spiedReporter = sinon.spy require 'coffeelint-stylish'
@@ -585,10 +577,10 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'fail\')', ->
-        sut = coffeelint: null
+
+        sut = {}
 
         beforeEach ->
-            # SUT
             sut.coffeelint = require '../'
 
         it 'should pass through an okay file', (done) ->
@@ -699,10 +691,10 @@ describe 'gulp-coffeelint', ->
             stream.end()
 
     describe 'running coffeelint.reporter(\'failOnWarning\')', ->
-        sut = coffeelint: null
+
+        sut = {}
 
         beforeEach ->
-            # SUT
             sut.coffeelint = require '../'
 
         it 'should pass through an okay file', (done) ->
@@ -792,7 +784,7 @@ describe 'gulp-coffeelint', ->
 
             fakeFile2.coffeelint =
                 warningCount: 1
-                errorCount:   0,
+                errorCount:   0
                 results: [bugs: 'kinda']
 
             stream = sut.coffeelint.reporter 'failOnWarning'
