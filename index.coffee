@@ -10,63 +10,26 @@ coffeelint  = require 'coffeelint'
 {getConfig} = require 'coffeelint/lib/configfinder'
 
 #-----------------------------------------------------------------------------#
-# Locals
+# Create and return a plugin error specific to this plugin. Might be thrown,
+# might be emitted, depending on the circumstances.
 #-----------------------------------------------------------------------------#
 
 createPluginError = (message) -> new PluginError 'gulp-coffeelint', message
 
+#-----------------------------------------------------------------------------#
+# Return true if the provided file looks like it's a literate type, false
+# otherwise.
+#-----------------------------------------------------------------------------#
+
 isLiterate = (file) -> /\.(litcoffee|coffee\.md)$/.test file
 
-formatOutput = (errorReport, opt, literate) ->
-
-    {errorCount, warningCount} = errorReport.getSummary()
-
-    return {
-        errorCount
-        warningCount
-        opt
-        literate
-        success: errorCount is 0
-        results: errorReport
-    }
-
-reporterStream = (reporterType) ->
-    return through2.obj (file, enc, cb) ->
-        c = file.coffeelint
-        # nothing to report or no errors AND no warnings
-        if not c or c.errorCount is c.warningCount is 0
-            @push file
-            return cb()
-
-        # report
-        new reporterType(file.coffeelint.results).publish()
-
-        # pass along
-        @push file
-        cb()
-
-failReporter = ->
-    return through2.obj (file, enc, cb) ->
-        # nothing to report or no errors
-        if not file.coffeelint or file.coffeelint.success
-            @push file
-            return cb()
-
-        # fail
-        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
-        cb()
-
-failOnWarningReporter = ->
-    return through2.obj (file, enc, cb) ->
-        c = file.coffeelint
-        # nothing to report or no errors AND no warnings
-        if not c or c.errorCount is c.warningCount is 0
-            @push file
-            return cb()
-
-        # fail
-        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
-        cb()
+#-----------------------------------------------------------------------------#
+# Attempt to load and return the requested type of reporter. Can be a short
+# name, e.g., 'raw', describing one of the standard coffeeelint reporters,
+# or can be the name of a custom reporter. If a type isn't specified, then
+# attempt to use the stylish reporter. Throws if despite our best attempts,
+# we couldn't load the type of reporter requested.
+#-----------------------------------------------------------------------------#
 
 loadReporter = (type) ->
 
@@ -78,6 +41,53 @@ loadReporter = (type) ->
     try return require type
 
     return throw createPluginError "#{type} is not a valid reporter"
+
+#-----------------------------------------------------------------------------#
+# Given a type of reporter loaded by loadReporter(), return a reporter
+# stream that reports if there were errors or warnings.
+#-----------------------------------------------------------------------------#
+
+reporterStream = (reporterType) ->
+    return through2.obj (file, enc, cb) ->
+        c = file.coffeelint
+        if not c or c.errorCount is c.warningCount is 0
+            @push file
+            return cb()
+        new reporterType(file.coffeelint.results).publish()
+        @push file
+        cb()
+
+#-----------------------------------------------------------------------------#
+# Return a reporter stream that reports only on errors.
+#-----------------------------------------------------------------------------#
+
+failReporter = ->
+    return through2.obj (file, enc, cb) ->
+        if not file.coffeelint or file.coffeelint.success
+            @push file
+            return cb()
+        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
+        cb()
+
+#-----------------------------------------------------------------------------#
+# Return a reporter stream that reports on errors or warnings.
+#-----------------------------------------------------------------------------#
+
+failOnWarningReporter = ->
+    return through2.obj (file, enc, cb) ->
+        c = file.coffeelint
+        if not c or c.errorCount is c.warningCount is 0
+            @push file
+            return cb()
+        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
+        cb()
+
+#-----------------------------------------------------------------------------#
+# Return a reporter stream for the type requested. Can be one of 'fail',
+# 'failOnWarning', one of the standard reporter types, e.g., 'raw', 'csv',
+# etc., or a custom reporter, e.g., 'coffeelint-stylish'. If no type is
+# provided, 'coffeelint-stylish' will be used.
+#-----------------------------------------------------------------------------#
 
 reporter = (type) ->
     return switch type
@@ -123,11 +133,7 @@ plugin = ->
             throw createPluginError "Could not load config from file: #{e}"
 
     through2.obj (file, enc, cb) ->
-        # `file` specific options
-        fileOpt      = opt
-        fileLiterate = literate
 
-        # pass along
         if file.isNull()
             @push file
             return cb()
@@ -136,18 +142,13 @@ plugin = ->
             @emit 'error', createPluginError 'Streaming not supported'
             return cb()
 
-        # if `opt` is not already a JSON `Object`,
-        # get config like `coffeelint` cli does.
-        fileOpt ?= getConfig file.path
-
-        # if `literate` is not given
-        # check for file extension like
-        # `coffeelint`cli does.
-        fileLiterate ?= isLiterate file.path
+        fileOpt      = getConfig  file.path unless (fileOpt      = opt     )?
+        fileLiterate = isLiterate file.path unless (fileLiterate = literate)?
 
         # get results `Array`
         # see http://www.coffeelint.org/#api
         # for format
+
         errorReport = coffeelint.getErrorReport()
         errorReport.lint(
             file.relative,
@@ -155,8 +156,15 @@ plugin = ->
             fileOpt,
             fileLiterate
         )
+        summary = errorReport.getSummary()
 
-        file.coffeelint = formatOutput errorReport, fileOpt, fileLiterate
+        file.coffeelint =
+            results:      errorReport
+            success:      summary.errorCount is 0
+            errorCount:   summary.errorCount
+            warningCount: summary.warningCount
+            opt:          fileOpt
+            literate:     fileLiterate
 
         @push file
         cb()

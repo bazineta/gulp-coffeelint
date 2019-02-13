@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------#
 // Imports
 //-----------------------------------------------------------------------------#
-var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, formatOutput, fs, getConfig, isLiterate, loadReporter, plugin, reporter, reporterStream, through2;
+var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, fs, getConfig, isLiterate, loadReporter, plugin, reporter, reporterStream, through2;
 
 Args = require('args-js');
 
@@ -16,74 +16,28 @@ coffeelint = require('coffeelint');
 ({getConfig} = require('coffeelint/lib/configfinder'));
 
 //-----------------------------------------------------------------------------#
-// Locals
+// Create and return a plugin error specific to this plugin. Might be thrown,
+// might be emitted, depending on the circumstances.
 //-----------------------------------------------------------------------------#
 createPluginError = function(message) {
   return new PluginError('gulp-coffeelint', message);
 };
 
+//-----------------------------------------------------------------------------#
+// Return true if the provided file looks like it's a literate type, false
+// otherwise.
+//-----------------------------------------------------------------------------#
 isLiterate = function(file) {
   return /\.(litcoffee|coffee\.md)$/.test(file);
 };
 
-formatOutput = function(errorReport, opt, literate) {
-  var errorCount, warningCount;
-  ({errorCount, warningCount} = errorReport.getSummary());
-  return {
-    errorCount,
-    warningCount,
-    opt,
-    literate,
-    success: errorCount === 0,
-    results: errorReport
-  };
-};
-
-reporterStream = function(reporterType) {
-  return through2.obj(function(file, enc, cb) {
-    var c, ref;
-    c = file.coffeelint;
-    // nothing to report or no errors AND no warnings
-    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
-      this.push(file);
-      return cb();
-    }
-    // report
-    new reporterType(file.coffeelint.results).publish();
-    // pass along
-    this.push(file);
-    return cb();
-  });
-};
-
-failReporter = function() {
-  return through2.obj(function(file, enc, cb) {
-    // nothing to report or no errors
-    if (!file.coffeelint || file.coffeelint.success) {
-      this.push(file);
-      return cb();
-    }
-    // fail
-    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
-    return cb();
-  });
-};
-
-failOnWarningReporter = function() {
-  return through2.obj(function(file, enc, cb) {
-    var c, ref;
-    c = file.coffeelint;
-    // nothing to report or no errors AND no warnings
-    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
-      this.push(file);
-      return cb();
-    }
-    // fail
-    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
-    return cb();
-  });
-};
-
+//-----------------------------------------------------------------------------#
+// Attempt to load and return the requested type of reporter. Can be a short
+// name, e.g., 'raw', describing one of the standard coffeeelint reporters,
+// or can be the name of a custom reporter. If a type isn't specified, then
+// attempt to use the stylish reporter. Throws if despite our best attempts,
+// we couldn't load the type of reporter requested.
+//-----------------------------------------------------------------------------#
 loadReporter = function(type) {
   if (typeof type === 'function') {
     return type;
@@ -100,6 +54,60 @@ loadReporter = function(type) {
   throw createPluginError(`${type} is not a valid reporter`);
 };
 
+//-----------------------------------------------------------------------------#
+// Given a type of reporter loaded by loadReporter(), return a reporter
+// stream that reports if there were errors or warnings.
+//-----------------------------------------------------------------------------#
+reporterStream = function(reporterType) {
+  return through2.obj(function(file, enc, cb) {
+    var c, ref;
+    c = file.coffeelint;
+    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
+      this.push(file);
+      return cb();
+    }
+    new reporterType(file.coffeelint.results).publish();
+    this.push(file);
+    return cb();
+  });
+};
+
+//-----------------------------------------------------------------------------#
+// Return a reporter stream that reports only on errors.
+//-----------------------------------------------------------------------------#
+failReporter = function() {
+  return through2.obj(function(file, enc, cb) {
+    if (!file.coffeelint || file.coffeelint.success) {
+      this.push(file);
+      return cb();
+    }
+    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
+    return cb();
+  });
+};
+
+//-----------------------------------------------------------------------------#
+// Return a reporter stream that reports on errors or warnings.
+//-----------------------------------------------------------------------------#
+failOnWarningReporter = function() {
+  return through2.obj(function(file, enc, cb) {
+    var c, ref;
+    c = file.coffeelint;
+    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
+      this.push(file);
+      return cb();
+    }
+    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
+    return cb();
+  });
+};
+
+//-----------------------------------------------------------------------------#
+// Return a reporter stream for the type requested. Can be one of 'fail',
+// 'failOnWarning', one of the standard reporter types, e.g., 'raw', 'csv',
+// etc., or a custom reporter, e.g., 'coffeelint-stylish'. If no type is
+// provided, 'coffeelint-stylish' will be used.
+//-----------------------------------------------------------------------------#
 reporter = function(type) {
   switch (type) {
     case 'fail':
@@ -159,11 +167,7 @@ plugin = function() {
     }
   }
   return through2.obj(function(file, enc, cb) {
-    var errorReport, fileLiterate, fileOpt;
-    // `file` specific options
-    fileOpt = opt;
-    fileLiterate = literate;
-    // pass along
+    var errorReport, fileLiterate, fileOpt, summary;
     if (file.isNull()) {
       this.push(file);
       return cb();
@@ -172,15 +176,10 @@ plugin = function() {
       this.emit('error', createPluginError('Streaming not supported'));
       return cb();
     }
-    // if `opt` is not already a JSON `Object`,
-    // get config like `coffeelint` cli does.
-    if (fileOpt == null) {
+    if ((fileOpt = opt) == null) {
       fileOpt = getConfig(file.path);
     }
-    // if `literate` is not given
-    // check for file extension like
-    // `coffeelint`cli does.
-    if (fileLiterate == null) {
+    if ((fileLiterate = literate) == null) {
       fileLiterate = isLiterate(file.path);
     }
     // get results `Array`
@@ -188,7 +187,15 @@ plugin = function() {
     // for format
     errorReport = coffeelint.getErrorReport();
     errorReport.lint(file.relative, file.contents.toString(), fileOpt, fileLiterate);
-    file.coffeelint = formatOutput(errorReport, fileOpt, fileLiterate);
+    summary = errorReport.getSummary();
+    file.coffeelint = {
+      results: errorReport,
+      success: summary.errorCount === 0,
+      errorCount: summary.errorCount,
+      warningCount: summary.warningCount,
+      opt: fileOpt,
+      literate: fileLiterate
+    };
     this.push(file);
     return cb();
   });
