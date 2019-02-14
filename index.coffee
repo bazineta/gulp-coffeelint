@@ -84,7 +84,7 @@ failReporter = ->
 failOnWarningReporter = ->
     return through2.obj (file, enc, cb) ->
         return failTest.bind(@) file, cb, (lint) ->
-            return lint.errorCount is 0 and lint.warningCount is 0
+            return (lint.errorCount is 0) and (lint.warningCount is 0)
 
 #-----------------------------------------------------------------------------#
 # Return a reporter stream for the type requested. Can be one of 'fail',

@@ -105,7 +105,7 @@ failReporter = function() {
 failOnWarningReporter = function() {
   return through2.obj(function(file, enc, cb) {
     return failTest.bind(this)(file, cb, function(lint) {
-      return lint.errorCount === 0 && lint.warningCount === 0;
+      return (lint.errorCount === 0) && (lint.warningCount === 0);
     });
   });
 };
