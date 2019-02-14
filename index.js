@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------#
 // Imports
 //-----------------------------------------------------------------------------#
-var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, fs, getConfig, isLiterate, loadReporter, plugin, reporter, reporterStream, through2;
+var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, failTest, fs, getConfig, isLiterate, loadReporter, plugin, reporter, reporterStream, through2;
 
 Args = require('args-js');
 
@@ -60,16 +60,32 @@ loadReporter = function(type) {
 //-----------------------------------------------------------------------------#
 reporterStream = function(reporterType) {
   return through2.obj(function(file, enc, cb) {
-    var c, ref;
-    c = file.coffeelint;
-    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
+    var lint, ref;
+    lint = file.coffeelint;
+    if (!lint || (lint.errorCount === (ref = lint.warningCount) && ref === 0)) {
       this.push(file);
       return cb();
     }
-    new reporterType(file.coffeelint.results).publish();
+    new reporterType(lint.results).publish();
     this.push(file);
     return cb();
   });
+};
+
+//-----------------------------------------------------------------------------#
+// Common bound function for the fail and failOnWarning reporters that follow;
+// if there's no lint for the provided file or there is lint but the provided
+// test is willing to call it good, then push the file and move on, otherwise
+// emit an error for the file.
+//-----------------------------------------------------------------------------#
+failTest = function(file, cb, test) {
+  var lint;
+  if (!(lint = file.coffeelint) || test(lint)) {
+    this.push(file);
+  } else {
+    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
+  }
+  return cb();
 };
 
 //-----------------------------------------------------------------------------#
@@ -77,12 +93,9 @@ reporterStream = function(reporterType) {
 //-----------------------------------------------------------------------------#
 failReporter = function() {
   return through2.obj(function(file, enc, cb) {
-    if (!file.coffeelint || file.coffeelint.success) {
-      this.push(file);
-      return cb();
-    }
-    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
-    return cb();
+    return failTest.bind(this)(file, cb, function(lint) {
+      return lint.success;
+    });
   });
 };
 
@@ -91,14 +104,9 @@ failReporter = function() {
 //-----------------------------------------------------------------------------#
 failOnWarningReporter = function() {
   return through2.obj(function(file, enc, cb) {
-    var c, ref;
-    c = file.coffeelint;
-    if (!c || (c.errorCount === (ref = c.warningCount) && ref === 0)) {
-      this.push(file);
-      return cb();
-    }
-    this.emit('error', createPluginError(`CoffeeLint failed for ${file.relative}`));
-    return cb();
+    return failTest.bind(this)(file, cb, function(lint) {
+      return lint.errorCount === 0 && lint.warningCount === 0;
+    });
   });
 };
 

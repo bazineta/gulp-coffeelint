@@ -49,13 +49,25 @@ loadReporter = (type) ->
 
 reporterStream = (reporterType) ->
     return through2.obj (file, enc, cb) ->
-        c = file.coffeelint
-        if not c or c.errorCount is c.warningCount is 0
+        lint = file.coffeelint
+        if not lint or lint.errorCount is lint.warningCount is 0
             @push file
             return cb()
-        new reporterType(file.coffeelint.results).publish()
+        new reporterType(lint.results).publish()
         @push file
         cb()
+
+#-----------------------------------------------------------------------------#
+# Common bound function for the fail and failOnWarning reporters that follow;
+# if there's no lint for the provided file or there is lint but the provided
+# test is willing to call it good, then push the file and move on, otherwise
+# emit an error for the file.
+#-----------------------------------------------------------------------------#
+
+failTest = (file, cb, test) ->
+    if not (lint = file.coffeelint) or test lint then @push file
+    else @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
+    return cb()
 
 #-----------------------------------------------------------------------------#
 # Return a reporter stream that reports only on errors.
@@ -63,11 +75,7 @@ reporterStream = (reporterType) ->
 
 failReporter = ->
     return through2.obj (file, enc, cb) ->
-        if not file.coffeelint or file.coffeelint.success
-            @push file
-            return cb()
-        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
-        cb()
+        return failTest.bind(@) file, cb, (lint) -> lint.success
 
 #-----------------------------------------------------------------------------#
 # Return a reporter stream that reports on errors or warnings.
@@ -75,12 +83,8 @@ failReporter = ->
 
 failOnWarningReporter = ->
     return through2.obj (file, enc, cb) ->
-        c = file.coffeelint
-        if not c or c.errorCount is c.warningCount is 0
-            @push file
-            return cb()
-        @emit 'error', createPluginError "CoffeeLint failed for #{file.relative}"
-        cb()
+        return failTest.bind(@) file, cb, (lint) ->
+            return lint.errorCount is 0 and lint.warningCount is 0
 
 #-----------------------------------------------------------------------------#
 # Return a reporter stream for the type requested. Can be one of 'fail',

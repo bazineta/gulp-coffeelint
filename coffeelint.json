@@ -38,9 +38,6 @@
         "value": 3,
         "level": "error"
     },
-    "no_stand_alone_at": {
-        "level": "error"
-    },
     "arrow_spacing": {
         "level": "error"
     },
