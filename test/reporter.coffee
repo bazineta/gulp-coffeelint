@@ -255,6 +255,54 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.end()
 
+        it 'calls reporter if errors', (done) ->
+            data = counter: 0
+
+            fakeFile = new vinyl
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
+                contents: Buffer.from 'success()'
+
+            fakeFile.coffeelint =
+                success:      true
+                warningCount: 0
+                errorCount:   2
+                results:
+                    paths:
+                        'file.js': [bugs: 'some']
+
+            fakeFile2 = new vinyl
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
+                contents: Buffer.from 'yeahmetoo()'
+
+            fakeFile2.coffeelint =
+                success:      true
+                warningCount: 0
+                errorCount:   0
+
+            stream = sut.coffeelint.reporter(sut.spiedReporter)
+
+            stream.on 'data', (newFile) ->
+                ++data.counter
+
+            stream.once 'end', ->
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
+                (should callArgs).eql [
+                    paths:
+                        'file.js': [bugs: 'some']
+                ]
+                done()
+
+            stream.write fakeFile
+            stream.write fakeFile2
+            stream.end()
+
     describe 'running coffeelint.reporter(\'raw\')', ->
 
         sut = {}
