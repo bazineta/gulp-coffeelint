@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------#
 // Imports
 //-----------------------------------------------------------------------------#
-var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, failTest, fs, getConfig, isLiterate, loadReporter, plugin, reporter, reporterStream, through2;
+var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, failTest, fs, getConfig, isLiterate, loadReporter, plugin, reporterStream, through2;
 
 Args = require('args-js');
 
@@ -111,23 +111,6 @@ failOnWarningReporter = function() {
 };
 
 //-----------------------------------------------------------------------------#
-// Return a reporter stream for the type requested. Can be one of 'fail',
-// 'failOnWarning', one of the standard reporter types, e.g., 'raw', 'csv',
-// etc., or a custom reporter, e.g., 'coffeelint-stylish'. If no type is
-// provided, 'coffeelint-stylish' will be used.
-//-----------------------------------------------------------------------------#
-reporter = function(type) {
-  switch (type) {
-    case 'fail':
-      return failReporter();
-    case 'failOnWarning':
-      return failOnWarningReporter();
-    default:
-      return reporterStream(loadReporter(type));
-  }
-};
-
-//-----------------------------------------------------------------------------#
 // Plugin
 //-----------------------------------------------------------------------------#
 plugin = function() {
@@ -209,7 +192,22 @@ plugin = function() {
   });
 };
 
-plugin.reporter = reporter;
+//-----------------------------------------------------------------------------#
+// Return a reporter stream for the type requested. Can be one of 'fail',
+// 'failOnWarning', one of the standard reporter types, e.g., 'raw', 'csv',
+// etc., or a custom reporter, e.g., 'coffeelint-stylish'. If no type is
+// provided, 'coffeelint-stylish' will be used.
+//-----------------------------------------------------------------------------#
+plugin.reporter = function(type) {
+  switch (type) {
+    case 'fail':
+      return failReporter();
+    case 'failOnWarning':
+      return failOnWarningReporter();
+    default:
+      return reporterStream(loadReporter(type));
+  }
+};
 
 //-----------------------------------------------------------------------------#
 // Exports

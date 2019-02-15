@@ -87,19 +87,6 @@ failOnWarningReporter = ->
             return (lint.errorCount is 0) and (lint.warningCount is 0)
 
 #-----------------------------------------------------------------------------#
-# Return a reporter stream for the type requested. Can be one of 'fail',
-# 'failOnWarning', one of the standard reporter types, e.g., 'raw', 'csv',
-# etc., or a custom reporter, e.g., 'coffeelint-stylish'. If no type is
-# provided, 'coffeelint-stylish' will be used.
-#-----------------------------------------------------------------------------#
-
-reporter = (type) ->
-    return switch type
-        when 'fail'          then failReporter()
-        when 'failOnWarning' then failOnWarningReporter()
-        else                      reporterStream loadReporter type
-
-#-----------------------------------------------------------------------------#
 # Plugin
 #-----------------------------------------------------------------------------#
 
@@ -173,7 +160,18 @@ plugin = ->
         @push file
         cb()
 
-plugin.reporter = reporter
+#-----------------------------------------------------------------------------#
+# Return a reporter stream for the type requested. Can be one of 'fail',
+# 'failOnWarning', one of the standard reporter types, e.g., 'raw', 'csv',
+# etc., or a custom reporter, e.g., 'coffeelint-stylish'. If no type is
+# provided, 'coffeelint-stylish' will be used.
+#-----------------------------------------------------------------------------#
+
+plugin.reporter = (type) ->
+    return switch type
+        when 'fail'          then failReporter()
+        when 'failOnWarning' then failOnWarningReporter()
+        else                      reporterStream loadReporter type
 
 #-----------------------------------------------------------------------------#
 # Exports
