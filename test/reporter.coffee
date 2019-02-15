@@ -165,6 +165,96 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.end()
 
+    describe 'running coffeelint.reporter(<function>)', ->
+
+        sut = {}
+
+        beforeEach ->
+
+            sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
+            sut.coffeelint    = require '../'
+            sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
+                .callsFake -> 'I am a mocking bird'
+
+        afterEach ->
+            sut.spiedReporter.resetHistory()
+            sut.spiedReporter.prototype.publish.restore()
+
+        it 'should pass through a file', (done) ->
+            data = counter: 0
+
+            fakeFile = new vinyl
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
+                contents: Buffer.from 'sure()'
+
+            stream = sut.coffeelint.reporter(sut.spiedReporter)
+
+            stream.on 'data', (newFile) ->
+                should.exist(newFile)
+                should.exist(newFile.path)
+                should.exist(newFile.relative)
+                should.exist(newFile.contents)
+                newFile.path.should.equal 'test/fixture/file.js'
+                newFile.relative.should.equal 'file.js'
+                ++data.counter
+
+            stream.once 'end', ->
+                data.counter.should.equal 1
+                done()
+
+            stream.write fakeFile
+            stream.end()
+
+        it 'calls reporter if warnings', (done) ->
+            data = counter: 0
+
+            fakeFile = new vinyl
+                path:    './test/fixture/file.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
+                contents: Buffer.from 'success()'
+
+            fakeFile.coffeelint =
+                success:      true
+                warningCount: 0
+                errorCount:   0
+
+            fakeFile2 = new vinyl
+                path:    './test/fixture/file2.js'
+                cwd:     './test/'
+                base:    './test/fixture/'
+                contents: Buffer.from 'yeahmetoo()'
+
+            fakeFile2.coffeelint =
+                success:      true
+                warningCount: 2
+                errorCount:   0
+                results:
+                    paths:
+                        'file2.js': [bugs: 'kinda']
+
+            stream = sut.coffeelint.reporter(sut.spiedReporter)
+
+            stream.on 'data', (newFile) ->
+                ++data.counter
+
+            stream.once 'end', ->
+                data.counter.should.equal 2
+                sut.spiedReporter.callCount.should.equal 1
+                sut.publishStub.callCount.should.equal 1
+                callArgs = sut.spiedReporter.firstCall.args
+                (should callArgs).eql [
+                    paths:
+                        'file2.js': [bugs: 'kinda']
+                ]
+                done()
+
+            stream.write fakeFile
+            stream.write fakeFile2
+            stream.end()
+
     describe 'running coffeelint.reporter(\'raw\')', ->
 
         sut = {}
