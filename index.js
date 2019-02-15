@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------#
 // Imports
 //-----------------------------------------------------------------------------#
-var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, failTest, fs, getConfig, isLiterate, loadReporter, plugin, reporterStream, through2;
+var Args, PluginError, coffeelint, createPluginError, failOnWarningReporter, failReporter, failTest, fs, getConfig, isLiterate, loadReporter, plugin, reporterStream, through;
 
 Args = require('args-js');
 
@@ -9,7 +9,7 @@ PluginError = require('plugin-error');
 
 fs = require('fs');
 
-through2 = require('through2');
+through = require('through2');
 
 coffeelint = require('coffeelint');
 
@@ -59,7 +59,7 @@ loadReporter = function(type) {
 // stream that reports if there were errors or warnings.
 //-----------------------------------------------------------------------------#
 reporterStream = function(reporterType) {
-  return through2.obj(function(file, enc, cb) {
+  return through.obj(function(file, enc, cb) {
     var lint, ref;
     lint = file.coffeelint;
     if (!lint || (lint.errorCount === (ref = lint.warningCount) && ref === 0)) {
@@ -92,7 +92,7 @@ failTest = function(file, cb, test) {
 // Return a reporter stream that reports only on errors.
 //-----------------------------------------------------------------------------#
 failReporter = function() {
-  return through2.obj(function(file, enc, cb) {
+  return through.obj(function(file, enc, cb) {
     return failTest.bind(this)(file, cb, function(lint) {
       return lint.success;
     });
@@ -103,7 +103,7 @@ failReporter = function() {
 // Return a reporter stream that reports on errors or warnings.
 //-----------------------------------------------------------------------------#
 failOnWarningReporter = function() {
-  return through2.obj(function(file, enc, cb) {
+  return through.obj(function(file, enc, cb) {
     return failTest.bind(this)(file, cb, function(lint) {
       return (lint.errorCount === 0) && (lint.warningCount === 0);
     });
@@ -157,7 +157,7 @@ plugin = function() {
       throw createPluginError(`Could not load config from file: ${e}`);
     }
   }
-  return through2.obj(function(file, enc, cb) {
+  return through.obj(function(file, enc, cb) {
     var errorReport, fileLiterate, fileOpt, summary;
     if (file.isNull()) {
       this.push(file);

@@ -5,7 +5,7 @@
 Args        = require 'args-js'
 PluginError = require 'plugin-error'
 fs          = require 'fs'
-through2    = require 'through2'
+through     = require 'through2'
 coffeelint  = require 'coffeelint'
 {getConfig} = require 'coffeelint/lib/configfinder'
 
@@ -48,7 +48,7 @@ loadReporter = (type) ->
 #-----------------------------------------------------------------------------#
 
 reporterStream = (reporterType) ->
-    return through2.obj (file, enc, cb) ->
+    return through.obj (file, enc, cb) ->
         lint = file.coffeelint
         if not lint or lint.errorCount is lint.warningCount is 0
             @push file
@@ -74,7 +74,7 @@ failTest = (file, cb, test) ->
 #-----------------------------------------------------------------------------#
 
 failReporter = ->
-    return through2.obj (file, enc, cb) ->
+    return through.obj (file, enc, cb) ->
         return failTest.bind(@) file, cb, (lint) -> lint.success
 
 #-----------------------------------------------------------------------------#
@@ -82,7 +82,7 @@ failReporter = ->
 #-----------------------------------------------------------------------------#
 
 failOnWarningReporter = ->
-    return through2.obj (file, enc, cb) ->
+    return through.obj (file, enc, cb) ->
         return failTest.bind(@) file, cb, (lint) ->
             return (lint.errorCount is 0) and (lint.warningCount is 0)
 
@@ -123,7 +123,7 @@ plugin = ->
         catch e
             throw createPluginError "Could not load config from file: #{e}"
 
-    through2.obj (file, enc, cb) ->
+    through.obj (file, enc, cb) ->
 
         if file.isNull()
             @push file
