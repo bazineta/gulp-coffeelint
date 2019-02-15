@@ -47,10 +47,10 @@ loadReporter = function(type) {
   }
   try {
     return require(`coffeelint/lib/reporters/${type}`);
-  } catch (error) {}
+  } catch (error1) {}
   try {
     return require(type);
-  } catch (error) {}
+  } catch (error1) {}
   throw createPluginError(`${type} is not a valid reporter`);
 };
 
@@ -114,9 +114,8 @@ failOnWarningReporter = function() {
 // Plugin
 //-----------------------------------------------------------------------------#
 plugin = function() {
-  var e, literate, opt, optFile, rules;
+  var error, literate, opt, optFile, rules;
   try {
-    // parse arguments
     ({opt, optFile, literate, rules} = Args([
       {
         optFile: Args.STRING | Args.Optional
@@ -132,9 +131,11 @@ plugin = function() {
         _default: []
       }
     ], arguments));
-  } catch (error) {
-    e = error;
-    throw createPluginError(e);
+  } catch (error1) {
+    // istanbul ignore next
+    error = error1;
+    // istanbul ignore next
+    throw createPluginError(error);
   }
   // sadly an `Args.OBJECT` maybe an `Array`
   // e.g. `coffeelintPlugin [-> myCustomRule]`
@@ -152,9 +153,9 @@ plugin = function() {
   if (toString.call(optFile) === '[object String]') {
     try {
       opt = JSON.parse(fs.readFileSync(optFile).toString());
-    } catch (error) {
-      e = error;
-      throw createPluginError(`Could not load config from file: ${e}`);
+    } catch (error1) {
+      error = error1;
+      throw createPluginError(`Could not load config from file: ${error}`);
     }
   }
   return through.obj(function(file, enc, cb) {

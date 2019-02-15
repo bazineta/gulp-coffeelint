@@ -92,7 +92,6 @@ failOnWarningReporter = ->
 
 plugin = ->
 
-    # parse arguments
     try
         {opt, optFile, literate, rules} = Args [
             {optFile:  Args.STRING | Args.Optional}
@@ -100,8 +99,10 @@ plugin = ->
             {literate: Args.BOOL   | Args.Optional}
             {rules:    Args.ARRAY  | Args.Optional, _default: []}
         ], arguments
-    catch e
-        throw createPluginError e
+    # istanbul ignore next
+    catch error
+        # istanbul ignore next
+        throw createPluginError error
 
     # sadly an `Args.OBJECT` maybe an `Array`
     # e.g. `coffeelintPlugin [-> myCustomRule]`
@@ -120,8 +121,8 @@ plugin = ->
     if toString.call(optFile) is '[object String]'
         try
             opt = JSON.parse fs.readFileSync(optFile).toString()
-        catch e
-            throw createPluginError "Could not load config from file: #{e}"
+        catch error
+            throw createPluginError "Could not load config from file: #{error}"
 
     through.obj (file, enc, cb) ->
 
