@@ -398,8 +398,7 @@ describe 'gulp-coffeelint', ->
                 stream.write fakeFile
                 stream.end()
 
-
-
+            return
 
         describe 'errors', ->
             describe 'are thrown', ->
@@ -419,6 +418,8 @@ describe 'gulp-coffeelint', ->
                         should(e.message).containEql ERR_MSG.CONFIG
                         done()
 
+                return
+
             describe 'are emitted', ->
                 it 'if file is stream', (done) ->
                     fakeFile = new vinyl
@@ -436,3 +437,11 @@ describe 'gulp-coffeelint', ->
 
                     stream.write fakeFile
                     stream.end()
+
+                return
+
+            return
+
+        return
+
+    return

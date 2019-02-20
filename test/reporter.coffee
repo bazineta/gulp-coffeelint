@@ -28,6 +28,8 @@ describe 'gulp-coffeelint', ->
                 should(e.message).equal "stupid #{ERR_MSG.REPORTER}"
                 done()
 
+        return
+
     describe 'running coffeelint.reporter()', ->
 
         sut = {}
@@ -164,6 +166,8 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile
             stream.write fakeFile2
             stream.end()
+
+        return
 
     describe 'running coffeelint.reporter(<function>)', ->
 
@@ -303,6 +307,8 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.end()
 
+        return
+
     describe 'running coffeelint.reporter(\'raw\')', ->
 
         sut = {}
@@ -439,6 +445,8 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile
             stream.write fakeFile2
             stream.end()
+
+        return
 
     describe 'running coffeelint.reporter(\'coffeelint/lib/reporters/raw\')', ->
 
@@ -577,6 +585,8 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.end()
 
+        return
+
     describe 'running coffeelint.reporter(\'coffeelint-stylish\')', ->
 
         sut = {}
@@ -714,6 +724,8 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.end()
 
+        return
+
     describe 'running coffeelint.reporter(\'fail\')', ->
 
         sut = {}
@@ -827,6 +839,8 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.write fakeFile
             stream.end()
+
+        return
 
     describe 'running coffeelint.reporter(\'failOnWarning\')', ->
 
@@ -946,3 +960,7 @@ describe 'gulp-coffeelint', ->
             stream.write fakeFile2
             stream.write fakeFile
             stream.end()
+
+        return
+
+    return
