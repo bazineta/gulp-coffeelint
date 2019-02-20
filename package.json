@@ -37,16 +37,16 @@
   "devDependencies": {
     "coffeescope2": "^0.5.1",
     "coffeescript": "^2.3.2",
-    "conventional-changelog": "^3.0.5",
+    "conventional-changelog": "^3.0.6",
     "coveralls": "^3.0.2",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
     "gulp-coffee": "^3.0.3",
-    "mocha": "^5.2.0",
-    "nyc": "^13.2.0",
+    "mocha": "^6.0.0",
+    "nyc": "^13.3.0",
     "proxyquire": "^2.1.0",
     "should": "^13.2.3",
-    "sinon": "^7.2.3",
+    "sinon": "^7.2.4",
     "vinyl": "^2.2.0"
   },
   "engines": {
