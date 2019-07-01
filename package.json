@@ -32,21 +32,21 @@
     "coffeelint": "^2.1.0",
     "coffeelint-stylish": "^0.1.2",
     "plugin-error": "^1.0.1",
-    "through2": "^3.0.0"
+    "through2": "^3.0.1"
   },
   "devDependencies": {
     "coffeescope2": "^0.5.1",
-    "coffeescript": "^2.3.2",
-    "conventional-changelog": "^3.0.6",
-    "coveralls": "^3.0.2",
-    "del": "^3.0.0",
-    "gulp": "^4.0.0",
+    "coffeescript": "^2.4.1",
+    "conventional-changelog": "^3.1.8",
+    "coveralls": "^3.0.4",
+    "del": "^4.1.1",
+    "gulp": "^4.0.2",
     "gulp-coffee": "^3.0.3",
-    "mocha": "^6.0.0",
-    "nyc": "^13.3.0",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1",
     "proxyquire": "^2.1.0",
     "should": "^13.2.3",
-    "sinon": "^7.2.4",
+    "sinon": "^7.3.2",
     "vinyl": "^2.2.0"
   },
   "engines": {
