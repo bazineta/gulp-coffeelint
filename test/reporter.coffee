@@ -175,7 +175,7 @@ describe 'gulp-coffeelint', ->
 
         beforeEach ->
 
-            sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
+            sut.spiedReporter = sinon.spy require '@coffeelint/cli/lib/reporters/raw'
             sut.coffeelint    = require '../'
             sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
@@ -314,8 +314,8 @@ describe 'gulp-coffeelint', ->
         sut = {}
 
         beforeEach ->
-            sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
-            sut.coffeelint    = proxyquire '../', 'coffeelint/lib/reporters/raw': sut.spiedReporter
+            sut.spiedReporter = sinon.spy require '@coffeelint/cli/lib/reporters/raw'
+            sut.coffeelint    = proxyquire '../', '@coffeelint/cli/lib/reporters/raw': sut.spiedReporter
             sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
@@ -448,13 +448,13 @@ describe 'gulp-coffeelint', ->
 
         return
 
-    describe 'running coffeelint.reporter(\'coffeelint/lib/reporters/raw\')', ->
+    describe 'running coffeelint.reporter(\'@coffeelint/cli/lib/reporters/raw\')', ->
 
         sut = {}
 
         beforeEach ->
-            sut.spiedReporter = sinon.spy require 'coffeelint/lib/reporters/raw'
-            sut.coffeelint    = proxyquire '../', 'coffeelint/lib/reporters/raw': sut.spiedReporter
+            sut.spiedReporter = sinon.spy require '@coffeelint/cli/lib/reporters/raw'
+            sut.coffeelint    = proxyquire '../', '@coffeelint/cli/lib/reporters/raw': sut.spiedReporter
             sut.publishStub   = sinon.stub sut.spiedReporter.prototype, 'publish'
                 .callsFake -> 'I am a mocking bird'
 
@@ -471,7 +471,7 @@ describe 'gulp-coffeelint', ->
                 base:    './test/fixture/'
                 contents: Buffer.from 'sure()'
 
-            stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
+            stream = sut.coffeelint.reporter '@coffeelint/cli/lib/reporters/raw'
 
             stream.on 'data', (newFile) ->
                 should.exist(newFile)
@@ -517,7 +517,7 @@ describe 'gulp-coffeelint', ->
                     paths:
                         'file2.js': [bugs: 'kinda']
 
-            stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
+            stream = sut.coffeelint.reporter '@coffeelint/cli/lib/reporters/raw'
 
             stream.on 'data', (newFile) ->
                 ++data.counter
@@ -565,7 +565,7 @@ describe 'gulp-coffeelint', ->
                 warningCount: 0
                 errorCount:   0
 
-            stream = sut.coffeelint.reporter 'coffeelint/lib/reporters/raw'
+            stream = sut.coffeelint.reporter '@coffeelint/cli/lib/reporters/raw'
 
             stream.on 'data', (newFile) ->
                 ++data.counter

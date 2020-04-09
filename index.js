@@ -11,9 +11,9 @@ fs = require('fs');
 
 through = require('through2');
 
-coffeelint = require('coffeelint');
+coffeelint = require('@coffeelint/cli');
 
-({getConfig} = require('coffeelint/lib/configfinder'));
+({getConfig} = require('@coffeelint/cli/lib/configfinder'));
 
 //-----------------------------------------------------------------------------#
 // Create and return a plugin error specific to this plugin. Might be thrown,
@@ -46,7 +46,7 @@ loadReporter = function(type) {
     type = 'coffeelint-stylish';
   }
   try {
-    return require(`coffeelint/lib/reporters/${type}`);
+    return require(`@coffeelint/cli/lib/reporters/${type}`);
   } catch (error1) {}
   try {
     return require(type);

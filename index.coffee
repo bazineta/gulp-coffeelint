@@ -6,8 +6,8 @@ Args        = require 'args-js'
 PluginError = require 'plugin-error'
 fs          = require 'fs'
 through     = require 'through2'
-coffeelint  = require 'coffeelint'
-{getConfig} = require 'coffeelint/lib/configfinder'
+coffeelint  = require '@coffeelint/cli'
+{getConfig} = require '@coffeelint/cli/lib/configfinder'
 
 #-----------------------------------------------------------------------------#
 # Create and return a plugin error specific to this plugin. Might be thrown,
@@ -37,7 +37,7 @@ loadReporter = (type) ->
 
     type ?= 'coffeelint-stylish'
 
-    try return require "coffeelint/lib/reporters/#{type}"
+    try return require "@coffeelint/cli/lib/reporters/#{type}"
     try return require type
 
     return throw createPluginError "#{type} is not a valid reporter"
